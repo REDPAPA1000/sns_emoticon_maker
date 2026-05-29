@@ -1,9 +1,9 @@
-import type { Metadata } from 'next';
 import './globals.css';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'SNS Emoticon Maker',
-  description: 'Free BYOK SNS sticker and emoticon maker for KakaoTalk, Telegram, WhatsApp, Discord, LINE, and Instagram.'
+  description: '무료 BYOK 방식의 SNS 이모티콘/스티커 제작 도구',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
