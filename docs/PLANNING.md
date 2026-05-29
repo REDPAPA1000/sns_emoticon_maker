@@ -1,49 +1,49 @@
-# SNS Emoticon Maker Planning
+# SNS Emoticon Maker 기획
 
-## Product Direction
+## 서비스 방향
 
-SNS Emoticon Maker is a lightweight BYOK web app. Users upload an image, choose a market-informed visual style, choose a short phrase, and generate SNS sticker assets using their own Gemini API key.
+SNS Emoticon Maker는 사용자가 이미지를 업로드하고, 스타일과 짧은 문구를 선택해 SNS용 이모티콘 이미지를 만드는 BYOK 웹앱입니다. 운영자가 AI 사용 비용을 부담하지 않도록 사용자의 Gemini API Key를 직접 입력받는 구조입니다.
 
-## Design Principles
+## 설계 원칙
 
-- Keep the service free to operate by avoiding an operator-owned API key.
-- Never store user API keys in a database.
-- Make style selection visual and compact.
-- Use real market references for style direction, but do not copy paid sticker assets.
-- Keep export tooling browser-side where practical.
-- Treat platform exports as preparation helpers, not guaranteed official submission packages.
+- 운영자 소유의 공용 API Key를 사용하지 않는다.
+- 사용자 API Key를 DB에 저장하지 않는다.
+- 스타일 선택은 텍스트 설명보다 실제 참고 샘플을 중심으로 한다.
+- 실제 마켓의 인기 흐름을 참고하되, 판매 중인 이모티콘 이미지를 복사하지 않는다.
+- 가능한 기능은 브라우저에서 처리해 서버 부담을 줄인다.
+- 플랫폼별 내보내기는 제출 준비 도구이지, 공식 심사 통과 보장 도구가 아니다.
 
-## Style Library Decision
+## 스타일 라이브러리 결정
 
-The previous sample set was too abstract and did not resemble styles users commonly see in KakaoTalk. The current library is based on observed categories from Kakao Emoticon Shop and LINE Creators Market:
+기존 샘플은 너무 추상적이고 카카오톡에서 실제로 보는 이모티콘 감성과 거리가 있었다. 현재 스타일은 카카오 이모티콘샵과 LINE Creators Market에서 자주 보이는 흐름을 기준으로 다시 정리했다.
 
-- Mini character
-- Soft animal
-- Small gray cat
-- Hamster reaction
-- Yellow dog
-- Polite message
-- Work life
-- Couple heart
-- Meme reaction
-- Big text
-- Hand-drawn talk
-- Idol fan
+- 미니 캐릭터
+- 말랑 동물
+- 회색 고양이
+- 햄스터 리액션
+- 누렁이 감성
+- 공손 메시지
+- 사회생활
+- 커플 하트
+- 짤 반응
+- 큰글씨 톡
+- 낙서톡
+- 팬덤 응원
 
-The samples are original reference thumbnails. They should communicate direction, not duplicate actual commercial sticker packs.
+샘플 이미지는 원본 참고 썸네일이다. 실제 상업용 스티커팩의 이미지를 복제하지 않고, 스타일 방향만 전달하는 것이 목적이다.
 
-## Reference Sources
+## 참고 소스
 
-- Kakao Emoticon Shop search and popular style categories: https://e.kakao.com/search
-- Kakao popular items: https://e.kakao.com/item/hot
-- Kakao big emoticon category: https://e.kakao.com/style/group/12?sort=HOT&t_obj=search_style
+- 카카오 이모티콘샵 검색/인기 스타일: https://e.kakao.com/search
+- 카카오 지금 인기: https://e.kakao.com/item/hot
+- 카카오 큰이모티콘 카테고리: https://e.kakao.com/style/group/12?sort=HOT&t_obj=search_style
 - LINE Creators Market: https://creator.line.me/
 
-## Future Scope
+## 향후 작업
 
-- Replace SVG references with higher-quality original raster samples.
-- Add a source-backed style review workflow before adding new presets.
-- Add more accurate background removal.
-- Add optional 24 or 32 image sticker sets.
-- Add GIF/APNG generation.
-- Complete the Chrome extension flow.
+- SVG 참고 샘플을 더 완성도 높은 원본 래스터 이미지로 교체
+- 새 스타일 추가 전 실제 마켓 참고 검토 과정 추가
+- 더 정교한 배경 제거
+- 24종 또는 32종 세트 생성
+- GIF/APNG 생성
+- Chrome Extension 흐름 완성

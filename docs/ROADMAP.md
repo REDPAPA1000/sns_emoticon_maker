@@ -1,26 +1,26 @@
-# Roadmap
+# 로드맵
 
-## Done
+## 완료
 
-- BYOK Gemini API key input
-- Image upload
-- 12 market-informed style presets
-- Compact sample image for each style
-- Single sticker generation
-- 8 phrase set generation
-- Individual PNG download
-- Original 8 image ZIP download
-- Platform-sized ZIP download
-- Basic bright-background transparency cleanup
-- TypeScript check restored
-- ESLint CLI configured
+- Gemini API Key 직접 입력
+- 이미지 업로드
+- 실제 마켓 참고 기반 12개 스타일 프리셋
+- 스타일별 압축 샘플 이미지
+- 단일 이모티콘 생성
+- 기본 문구 8종 세트 생성
+- 개별 PNG 다운로드
+- 원본 8종 ZIP 다운로드
+- 플랫폼 규격별 ZIP 다운로드
+- 밝은 배경 1차 투명 처리
+- TypeScript 검사 복구
+- ESLint CLI 설정
 
-## Next
+## 다음 작업
 
-1. Add higher-quality background removal.
-2. Add clear retry and fallback guidance for Gemini failures.
-3. Improve platform-specific export validation.
-4. Add optional 24 or 32 image sets.
-5. Add GIF/APNG generation.
-6. Complete the Chrome extension flow.
-7. Add platform metadata generation for submission preparation.
+1. 더 정교한 배경 제거를 추가한다.
+2. Gemini 실패 시 재시도와 안내 문구를 강화한다.
+3. 플랫폼별 내보내기 검증을 개선한다.
+4. 24종 또는 32종 세트 옵션을 추가한다.
+5. GIF/APNG 생성을 지원한다.
+6. Chrome Extension 흐름을 완성한다.
+7. 제출 준비용 메타데이터 생성을 추가한다.
