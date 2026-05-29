@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 export type ApiKeyStatus = 'idle' | 'checking' | 'valid' | 'invalid';
 
@@ -21,6 +22,7 @@ export default function ApiKeyBox({ onChange, onStatusChange }: ApiKeyBoxProps) 
   const [status, setStatus] = useState<ApiKeyStatus>('idle');
   const [message, setMessage] = useState(STATUS_MESSAGE.idle);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const updateStatus = useCallback((nextStatus: ApiKeyStatus, nextMessage = STATUS_MESSAGE[nextStatus]) => {
     setStatus(nextStatus);
@@ -71,6 +73,10 @@ export default function ApiKeyBox({ onChange, onStatusChange }: ApiKeyBoxProps) 
   }, [onChange]);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     const trimmed = key.trim();
 
     if (!trimmed) {
@@ -114,7 +120,7 @@ export default function ApiKeyBox({ onChange, onStatusChange }: ApiKeyBoxProps) 
       </div>
       <p className={`status-message ${status}`}>{message}</p>
 
-      {guideOpen && (
+      {guideOpen && mounted && createPortal(
         <div className="modal-backdrop" role="presentation" onClick={() => setGuideOpen(false)}>
           <div className="modal" role="dialog" aria-modal="true" aria-labelledby="api-key-guide-title" onClick={(event) => event.stopPropagation()}>
             <div className="panel-header">
@@ -137,7 +143,8 @@ export default function ApiKeyBox({ onChange, onStatusChange }: ApiKeyBoxProps) 
               키는 이 브라우저의 localStorage에 저장됩니다. 생성 요청 중 서버 API로 전달되지만 DB에는 저장하지 않습니다.
             </p>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
