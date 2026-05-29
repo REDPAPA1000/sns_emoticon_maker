@@ -2,16 +2,15 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import ApiKeyBox from '@/components/ApiKeyBox';
+import ApiKeyBox, { ApiKeyStatus } from '@/components/ApiKeyBox';
 import ImageUploader from '@/components/ImageUploader';
 import StyleGrid from '@/components/StyleGrid';
-import PlatformGrid from '@/components/PlatformGrid';
 import { STYLES, StickerStyle } from '@/data/styles';
 import { PLATFORMS } from '@/data/platforms';
-import { downloadStickerZip, safeFileName, StickerFile } from '@/lib/zip';
 import { prepareStickerForPlatform, removeLightBackground } from '@/lib/image-processing';
+import { downloadStickerZip, safeFileName, StickerFile } from '@/lib/zip';
 
-const PHRASES = ['좋아!', '고마워', '최고야', '화이팅', '미안', '대박', '가자', '인정'];
+const PHRASES = ['좋아', '감사', '헉', '미안', '축하', '확인', '화이팅', '대박'];
 
 type GeneratedSticker = {
   phrase: string;
@@ -20,13 +19,11 @@ type GeneratedSticker = {
 
 export default function Home() {
   const [apiKey, setApiKey] = useState('');
+  const [apiKeyStatus, setApiKeyStatus] = useState<ApiKeyStatus>('idle');
   const [image, setImage] = useState('');
   const [selectedStyle, setSelectedStyle] = useState<StickerStyle>(STYLES[0]);
   const [selectedPlatformId, setSelectedPlatformId] = useState(PLATFORMS[0].id);
-  const [phrase, setPhrase] = useState(PHRASES[0]);
-  const [result, setResult] = useState('');
   const [setResults, setSetResults] = useState<GeneratedSticker[]>([]);
-  const [loading, setLoading] = useState(false);
   const [batchLoading, setBatchLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
   const [removeLightBg, setRemoveLightBg] = useState(true);
@@ -38,7 +35,8 @@ export default function Home() {
     [selectedPlatformId]
   );
 
-  const canGenerate = useMemo(() => Boolean(apiKey && image && selectedStyle), [apiKey, image, selectedStyle]);
+  const canGenerate = Boolean(apiKey && apiKeyStatus === 'valid' && image && selectedStyle && !batchLoading);
+  const progressPercent = setResults.length === 0 ? 0 : Math.round((setResults.length / PHRASES.length) * 100);
 
   const requestSticker = useCallback(async (targetPhrase: string) => {
     const response = await fetch('/api/generate', {
@@ -65,22 +63,6 @@ export default function Home() {
     const generatedImage = String(json.image);
     return removeLightBg ? removeLightBackground(generatedImage) : generatedImage;
   }, [apiKey, image, selectedStyle, removeLightBg]);
-
-  const generate = useCallback(async () => {
-    setError('');
-    setLoading(true);
-    setResult('');
-
-    try {
-      const generated = await requestSticker(phrase);
-      setResult(generated);
-    } catch (event: unknown) {
-      const message = event instanceof Error ? event.message : '알 수 없는 오류가 발생했습니다.';
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, [phrase, requestSticker]);
 
   const generateSet = useCallback(async () => {
     setError('');
@@ -109,20 +91,6 @@ export default function Home() {
     }
   }, [requestSticker]);
 
-  const downloadOriginalSet = useCallback(async () => {
-    try {
-      const files: StickerFile[] = setResults.map((item, index) => ({
-        fileName: `${String(index + 1).padStart(2, '0')}_${selectedStyle.id}_${safeFileName(item.phrase)}.png`,
-        dataUrl: item.image
-      }));
-
-      await downloadStickerZip(files, `sns-${selectedStyle.id}-original-8set.zip`);
-    } catch (event: unknown) {
-      const message = event instanceof Error ? event.message : 'ZIP 다운로드 중 오류가 발생했습니다.';
-      setError(message);
-    }
-  }, [selectedStyle.id, setResults]);
-
   const downloadPlatformSet = useCallback(async () => {
     setError('');
     setExportLoading(true);
@@ -147,173 +115,156 @@ export default function Home() {
 
       await downloadStickerZip(files, `${selectedPlatform.id}-${selectedStyle.id}-${selectedPlatform.width}x${selectedPlatform.height}-8set.zip`);
     } catch (event: unknown) {
-      const message = event instanceof Error ? event.message : '플랫폼 ZIP 변환 중 오류가 발생했습니다.';
+      const message = event instanceof Error ? event.message : '선택한 규격으로 ZIP을 만드는 중 오류가 발생했습니다.';
       setError(message);
     } finally {
       setExportLoading(false);
     }
   }, [removeLightBg, selectedPlatform, selectedStyle.id, setResults]);
 
-  const downloadPlatformSingle = useCallback(async () => {
-    if (!result) return;
-    setError('');
-    setExportLoading(true);
-
-    try {
-      const resized = await prepareStickerForPlatform(result, {
-        width: selectedPlatform.width,
-        height: selectedPlatform.height,
-        removeLightBg,
-        paddingRatio: 0.88
-      });
-
-      await downloadStickerZip([
-        {
-          fileName: `single_${selectedPlatform.id}_${selectedStyle.id}_${safeFileName(phrase)}.png`,
-          dataUrl: resized
-        }
-      ], `single-${selectedPlatform.id}-${selectedStyle.id}.zip`);
-    } catch (event: unknown) {
-      const message = event instanceof Error ? event.message : '단일 이미지 변환 중 오류가 발생했습니다.';
-      setError(message);
-    } finally {
-      setExportLoading(false);
-    }
-  }, [phrase, removeLightBg, result, selectedPlatform, selectedStyle.id]);
+  const readiness = [
+    { label: 'API Key', value: apiKeyStatus === 'valid' ? '유효' : '검증 필요', ready: apiKeyStatus === 'valid' },
+    { label: '원본 이미지', value: image ? '업로드 완료' : '대기', ready: Boolean(image) },
+    { label: '스타일', value: selectedStyle.name, ready: Boolean(selectedStyle) }
+  ];
 
   return (
-    <main className="container">
-      <section className="hero">
-        <span className="badge">무료 BYOK · SNS Sticker Generator</span>
-        <h1>SNS 이모티콘 메이커</h1>
-        <p>
-          사용자의 Gemini API Key와 업로드 이미지를 이용해 SNS용 이모티콘과 스티커를 만듭니다.
-          아래 샘플은 카카오 이모티콘샵과 LINE Creators Market의 실제 인기 스타일을 참고해 다시 구성한 원본 참고 이미지입니다.
-        </p>
-      </section>
+    <main className="app-shell">
+      <aside className="sidebar">
+        <div className="brand">
+          <span className="brand-dot" />
+          <span>SNS Emoticon Maker</span>
+        </div>
+        <nav className="side-steps" aria-label="작업 단계">
+          <a href="#key">1. API Key</a>
+          <a href="#source">2. 이미지</a>
+          <a href="#style">3. 스타일</a>
+          <a href="#result">4. 생성 결과</a>
+          <a href="#export">5. 저장</a>
+        </nav>
+      </aside>
 
-      <section className="section grid grid-2">
-        <ApiKeyBox onChange={setApiKey} />
-        <ImageUploader onImage={setImage} />
-      </section>
+      <section className="workspace">
+        <header className="topbar">
+          <div>
+            <span className="page-kicker">REDPAPA WEB APP</span>
+            <h1>사진 한 장으로 SNS 이모티콘 8종 만들기</h1>
+          </div>
+          <span className={`status-badge ${apiKeyStatus}`}>
+            API Key {apiKeyStatus === 'valid' ? '유효' : apiKeyStatus === 'invalid' ? '실패' : apiKeyStatus === 'checking' ? '검증 중' : '대기'}
+          </span>
+        </header>
 
-      <section className="section grid grid-2">
-        <div className="card">
-          <h3>3. 원본 / 생성 결과 미리보기</h3>
-          <div className="preview-box">
-            {result ? (
-              <img src={result} alt="generated sticker" />
-            ) : image ? (
-              <img src={image} alt="uploaded image" />
-            ) : (
-              <p className="small">이미지를 업로드하면 이 영역에 표시됩니다.</p>
+        <div className="workflow-grid">
+          <div className="workflow-main">
+            <div id="key">
+              <ApiKeyBox onChange={setApiKey} onStatusChange={setApiKeyStatus} />
+            </div>
+
+            <div id="source">
+              <ImageUploader image={image} onImage={setImage} />
+            </div>
+
+            <section id="style" className={`panel ${image ? '' : 'panel-disabled'}`}>
+              <div className="panel-header">
+                <div>
+                  <span className="step-label">STEP 3</span>
+                  <h2>스타일 선택</h2>
+                </div>
+                <span className="small">12개 스타일</span>
+              </div>
+              <StyleGrid selected={selectedStyle.id} onSelect={setSelectedStyle} disabled={!image} />
+              <p className="small style-note">
+                실제 메신저에서 쓰기 좋은 캐릭터, 반응, 문구형 스타일만 남겼습니다.
+              </p>
+            </section>
+          </div>
+
+          <aside className="result-column">
+            <section className="panel action-panel">
+              <div className="panel-header">
+                <div>
+                  <span className="step-label">STEP 4</span>
+                  <h2>8종 자동 생성</h2>
+                </div>
+              </div>
+              <div className="summary-list">
+                {readiness.map((item) => (
+                  <span className={item.ready ? 'ready' : ''} key={item.label}>
+                    <b>{item.label}</b>
+                    <em>{item.value}</em>
+                  </span>
+                ))}
+              </div>
+              <label className="check-row">
+                <input type="checkbox" checked={removeLightBg} onChange={(event) => setRemoveLightBg(event.target.checked)} />
+                <span>밝은 배경 자동 투명 처리</span>
+              </label>
+              <button className="btn full" disabled={!canGenerate} onClick={generateSet}>
+                {batchLoading ? '생성 중...' : '8종 생성'}
+              </button>
+              {batchProgress && (
+                <div className="progress-block">
+                  <div className="progress-track"><span style={{ width: `${progressPercent}%` }} /></div>
+                  <p className="small">{batchProgress}</p>
+                </div>
+              )}
+              {error && <p className="small error-text">{error}</p>}
+            </section>
+
+            <section id="export" className="panel export-panel">
+              <div className="panel-header">
+                <div>
+                  <span className="step-label">STEP 5</span>
+                  <h2>SNS 규격 저장</h2>
+                </div>
+              </div>
+              <label className="input-label" htmlFor="platform-select">저장 규격</label>
+              <select
+                id="platform-select"
+                className="input"
+                value={selectedPlatformId}
+                onChange={(event) => setSelectedPlatformId(event.target.value)}
+              >
+                {PLATFORMS.map((platform) => (
+                  <option key={platform.id} value={platform.id}>{platform.name} · {platform.size}</option>
+                ))}
+              </select>
+              <p className="small platform-note">{selectedPlatform.note}</p>
+              <button className="btn full" disabled={setResults.length === 0 || batchLoading || exportLoading} onClick={downloadPlatformSet}>
+                {exportLoading ? 'ZIP 생성 중...' : `${selectedPlatform.name} ZIP 다운로드`}
+              </button>
+            </section>
+          </aside>
+        </div>
+
+        <section id="result" className="panel results-panel">
+          <div className="panel-header result-tools">
+            <div>
+              <span className="step-label">RESULT</span>
+              <h2>생성 결과</h2>
+            </div>
+            <span className="small">{setResults.length} / {PHRASES.length}</span>
+          </div>
+          <div className="result-grid">
+            {setResults.length > 0 ? setResults.map((item, index) => (
+              <article className="result-card" key={`${item.phrase}-${index}`}>
+                <div className="thumb-box">
+                  <img src={item.image} alt={`${item.phrase} 이모티콘`} />
+                </div>
+                <strong>{item.phrase}</strong>
+                <a href={item.image} download={`${String(index + 1).padStart(2, '0')}_${selectedStyle.id}_${safeFileName(item.phrase)}.png`}>
+                  PNG 저장
+                </a>
+              </article>
+            )) : (
+              <div className="empty-results">
+                <b>아직 생성된 이모티콘이 없습니다.</b>
+                <span>API Key 검증, 이미지 업로드, 스타일 선택 후 8종 생성을 누르세요.</span>
+              </div>
             )}
           </div>
-          {result && (
-            <div className="button-row">
-              <a className="btn" href={result} download={`sns-sticker-${selectedStyle.id}.png`}>PNG 다운로드</a>
-              <button className="btn secondary" disabled={exportLoading} onClick={downloadPlatformSingle}>플랫폼 ZIP</button>
-            </div>
-          )}
-        </div>
-
-        <div className="card">
-          <h3>4. 단일 이미지 / 8종 세트 생성</h3>
-          <p className="small">선택한 스타일과 문구로 1개 이미지를 만들거나, 기본 문구 8종을 순차 생성합니다.</p>
-          <label className="label">문구 선택</label>
-          <select className="input" value={phrase} onChange={(event) => setPhrase(event.target.value)}>
-            {PHRASES.map((item) => (
-              <option key={item}>{item}</option>
-            ))}
-          </select>
-
-          <label className="check-row">
-            <input type="checkbox" checked={removeLightBg} onChange={(event) => setRemoveLightBg(event.target.checked)} />
-            <span>밝은 배경 자동 투명 처리</span>
-          </label>
-
-          <div className="button-row">
-            <button className="btn" disabled={!canGenerate || loading || batchLoading} onClick={generate}>
-              {loading ? '생성 중...' : `${selectedStyle.name} 1개 생성`}
-            </button>
-            <button className="btn secondary" disabled={!canGenerate || loading || batchLoading} onClick={generateSet}>
-              {batchLoading ? '8종 생성 중...' : '8종 세트 생성'}
-            </button>
-          </div>
-
-          {batchProgress && <p className="small">{batchProgress}</p>}
-          {error && <p className="small error-text">{error}</p>}
-        </div>
-      </section>
-
-      <section className="section grid grid-2">
-        <div className="card">
-          <h3>5. 플랫폼 규격 내보내기</h3>
-          <p className="small">생성된 이미지를 선택한 플랫폼 규격으로 중앙 배치하고 PNG ZIP으로 저장합니다.</p>
-          <label className="label">플랫폼 선택</label>
-          <select className="input" value={selectedPlatformId} onChange={(event) => setSelectedPlatformId(event.target.value)}>
-            {PLATFORMS.map((platform) => (
-              <option key={platform.id} value={platform.id}>{platform.name} · {platform.size}</option>
-            ))}
-          </select>
-          <p className="small selected-platform">
-            현재 선택: <b>{selectedPlatform.name}</b> · {selectedPlatform.width}x{selectedPlatform.height} PNG
-          </p>
-          <div className="button-row">
-            <button className="btn" disabled={setResults.length === 0 || batchLoading || exportLoading} onClick={downloadPlatformSet}>
-              {exportLoading ? '변환 중...' : '8종 플랫폼 ZIP'}
-            </button>
-            <button className="btn secondary" disabled={setResults.length === 0 || batchLoading || exportLoading} onClick={downloadOriginalSet}>
-              원본 8종 ZIP
-            </button>
-          </div>
-        </div>
-
-        <div className="card">
-          <h3>현재 기능 상태</h3>
-          <ul className="small status-list">
-            <li>Gemini BYOK 방식: 구현</li>
-            <li>시장 참고 스타일 샘플: 12종 구현</li>
-            <li>8종 문구 순차 생성: 구현</li>
-            <li>ZIP 다운로드: 구현</li>
-            <li>플랫폼별 리사이즈: 구현</li>
-            <li>정교한 배경 제거: 추후 API 연동 필요</li>
-          </ul>
-        </div>
-      </section>
-
-      {setResults.length > 0 && (
-        <section className="section">
-          <h2>8종 생성 결과</h2>
-          <div className="grid grid-4">
-            {setResults.map((item, index) => (
-              <div className="card" key={`${item.phrase}-${index}`}>
-                <div className="thumb-box">
-                  <img src={item.image} alt={`${item.phrase} sticker`} />
-                </div>
-                <strong>{index + 1}. {item.phrase}</strong>
-                <a
-                  className="small"
-                  href={item.image}
-                  download={`${String(index + 1).padStart(2, '0')}_${selectedStyle.id}_${safeFileName(item.phrase)}.png`}
-                >
-                  개별 PNG 다운로드
-                </a>
-              </div>
-            ))}
-          </div>
         </section>
-      )}
-
-      <section className="section">
-        <h2>스타일 샘플 라이브러리</h2>
-        <p className="small">실제 이모티콘 마켓의 인기 흐름을 기준으로 고른 12개 스타일입니다. 판매 중인 이미지를 복사하지 않고 방향성만 반영했습니다.</p>
-        <StyleGrid selected={selectedStyle.id} onSelect={setSelectedStyle} />
-      </section>
-
-      <section className="section">
-        <h2>플랫폼 내보내기 목표</h2>
-        <PlatformGrid />
       </section>
     </main>
   );
