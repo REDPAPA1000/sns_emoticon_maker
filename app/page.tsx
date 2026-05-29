@@ -23,7 +23,6 @@ export default function Home() {
   const [image, setImage] = useState('');
   const [selectedStyle, setSelectedStyle] = useState<StickerStyle>(STYLES[0]);
   const [selectedPlatformId, setSelectedPlatformId] = useState(PLATFORMS[0].id);
-  const [phrase, setPhrase] = useState(PHRASES[0]);
   const [result, setResult] = useState('');
   const [setResults, setSetResults] = useState<GeneratedSticker[]>([]);
   const [loading, setLoading] = useState(false);
@@ -72,7 +71,7 @@ export default function Home() {
     setResult('');
 
     try {
-      const generated = await requestSticker(phrase);
+      const generated = await requestSticker('');
       setResult(generated);
     } catch (event: unknown) {
       const message = event instanceof Error ? event.message : '오류가 발생했습니다.';
@@ -80,7 +79,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [phrase, requestSticker]);
+  }, [requestSticker]);
 
   const generateSet = useCallback(async () => {
     setError('');
@@ -169,7 +168,7 @@ export default function Home() {
 
       await downloadStickerZip([
         {
-          fileName: `single_${selectedPlatform.id}_${selectedStyle.id}_${safeFileName(phrase)}.png`,
+          fileName: `single_${selectedPlatform.id}_${selectedStyle.id}.png`,
           dataUrl: resized
         }
       ], `single-${selectedPlatform.id}-${selectedStyle.id}.zip`);
@@ -179,7 +178,7 @@ export default function Home() {
     } finally {
       setExportLoading(false);
     }
-  }, [phrase, removeLightBg, result, selectedPlatform, selectedStyle.id]);
+  }, [removeLightBg, result, selectedPlatform, selectedStyle.id]);
 
   return (
     <main className="container">
@@ -187,26 +186,37 @@ export default function Home() {
         <span className="badge">무료 BYOK · SNS Sticker Generator</span>
         <h1>SNS 이모티콘 메이커</h1>
         <p>
-          사용자가 자신의 Gemini API 키를 넣고, 이미지를 업로드한 뒤 원하는 스타일을 선택해
+          사용자가 자신의 Gemini API 키를 넣고, 이미지를 업로드한 뒤 원하는 스타일 샘플을 선택해
           카톡·텔레그램·왓츠앱·디스코드·LINE·인스타그램용 스티커를 제작하는 무료 웹앱입니다.
         </p>
       </section>
 
-      <section className="section grid grid-2">
+      <section className="section grid grid-2 fixed-grid">
         <ApiKeyBox onChange={setApiKey} />
         <ImageUploader onImage={setImage} />
       </section>
 
-      <section className="section grid grid-2">
+      <section className="section">
+        <div className="style-toolbar">
+          <div>
+            <h2>3. 스타일 샘플 선택</h2>
+            <p className="small">원하는 느낌의 샘플을 클릭하세요. 긴 설명 대신 샘플 이미지 중심으로 선택합니다.</p>
+          </div>
+          <span className="badge">선택됨: {selectedStyle.name}</span>
+        </div>
+        <StyleGrid selected={selectedStyle.id} onSelect={setSelectedStyle} />
+      </section>
+
+      <section className="section grid grid-2 fixed-grid">
         <div className="card">
-          <h3>3. 원본 / 대표 결과 미리보기</h3>
+          <h3>4. 원본 / 대표 결과 미리보기</h3>
           <div className="preview-box">
             {result ? (
               <img src={result} alt="generated sticker" />
             ) : image ? (
               <img src={image} alt="uploaded image" />
             ) : (
-              <p className="small">이미지를 업로드하면 여기에 표시됩니다.</p>
+              <p className="small">이미지를 업로드하면 여기에 고정 크기로 표시됩니다.</p>
             )}
           </div>
           {result && (
@@ -218,14 +228,10 @@ export default function Home() {
         </div>
 
         <div className="card">
-          <h3>4. 대표 이모티콘 / 8종 세트 생성</h3>
-          <p className="small">대표 1장 생성 또는 기본 문구 8종을 순차 생성해 ZIP으로 다운로드할 수 있습니다.</p>
-          <label className="label">문구 선택</label>
-          <select className="input" value={phrase} onChange={(event) => setPhrase(event.target.value)}>
-            {PHRASES.map((item) => (
-              <option key={item}>{item}</option>
-            ))}
-          </select>
+          <h3>5. 대표 이모티콘 / 8종 세트 생성</h3>
+          <p className="small">
+            문구를 따로 고를 필요 없이, 선택한 스타일로 대표 이미지 1장 또는 기본 문구 8종 세트를 자동 생성합니다.
+          </p>
 
           <label className="check-row">
             <input type="checkbox" checked={removeLightBg} onChange={(event) => setRemoveLightBg(event.target.checked)} />
@@ -234,10 +240,10 @@ export default function Home() {
 
           <div className="button-row">
             <button className="btn" disabled={!canGenerate || loading || batchLoading} onClick={generate}>
-              {loading ? '생성 중...' : `${selectedStyle.name} 대표 1장`}
+              {loading ? '생성 중...' : `${selectedStyle.name} 대표 1장 생성`}
             </button>
             <button className="btn secondary" disabled={!canGenerate || loading || batchLoading} onClick={generateSet}>
-              {batchLoading ? '8종 생성 중...' : '8종 세트 생성'}
+              {batchLoading ? '8종 생성 중...' : '8종 세트 자동 생성'}
             </button>
           </div>
 
@@ -246,9 +252,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section grid grid-2">
+      <section className="section grid grid-2 fixed-grid">
         <div className="card">
-          <h3>5. 플랫폼 내보내기</h3>
+          <h3>6. 플랫폼 내보내기</h3>
           <p className="small">생성된 이미지를 선택한 플랫폼 규격으로 중앙 배치·리사이즈한 뒤 ZIP으로 저장합니다.</p>
           <label className="label">플랫폼 선택</label>
           <select className="input" value={selectedPlatformId} onChange={(event) => setSelectedPlatformId(event.target.value)}>
@@ -273,6 +279,8 @@ export default function Home() {
           <h3>현재 기능 상태</h3>
           <ul className="small status-list">
             <li>Gemini BYOK 방식: 구현</li>
+            <li>API Key 발급 안내/유효성 검사: 구현</li>
+            <li>스타일 샘플 선택 UI: 구현</li>
             <li>8종 문구 일괄 생성: 구현</li>
             <li>ZIP 다운로드: 구현</li>
             <li>플랫폼별 리사이즈: 구현</li>
@@ -285,7 +293,7 @@ export default function Home() {
       {setResults.length > 0 && (
         <section className="section">
           <h2>8종 생성 결과</h2>
-          <div className="grid grid-4">
+          <div className="grid grid-4 fixed-grid">
             {setResults.map((item, index) => (
               <div className="card" key={`${item.phrase}-${index}`}>
                 <div className="thumb-box">
@@ -304,11 +312,6 @@ export default function Home() {
           </div>
         </section>
       )}
-
-      <section className="section">
-        <h2>스타일 라이브러리</h2>
-        <StyleGrid selected={selectedStyle.id} onSelect={setSelectedStyle} />
-      </section>
 
       <section className="section">
         <h2>플랫폼 내보내기 목표</h2>
