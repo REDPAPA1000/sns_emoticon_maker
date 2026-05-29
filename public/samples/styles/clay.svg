@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs><radialGradient id="c" cx="35%" cy="28%"><stop offset="0" stop-color="#fff0d2"/><stop offset=".55" stop-color="#ff9f73"/><stop offset="1" stop-color="#d9674e"/></radialGradient></defs>
+  <rect width="400" height="400" fill="#f5f2eb"/>
+  <ellipse cx="200" cy="315" rx="92" ry="20" fill="#d5cec0"/>
+  <path d="M104 190c0-68 44-106 96-106s96 38 96 106-44 104-96 104-96-36-96-104z" fill="url(#c)" stroke="#8c4b36" stroke-width="6"/>
+  <circle cx="164" cy="180" r="12" fill="#2b1b16"/><circle cx="236" cy="180" r="12" fill="#2b1b16"/>
+  <path d="M170 224c24 18 36 18 60 0" fill="none" stroke="#2b1b16" stroke-width="8" stroke-linecap="round"/>
+  <text x="200" y="363" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="800" fill="#171717">CLAY</text>
+</svg>

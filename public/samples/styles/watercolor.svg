@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#f3fbff"/>
+  <circle cx="186" cy="178" r="96" fill="#8ed4ff" opacity=".55"/>
+  <circle cx="220" cy="196" r="98" fill="#ffafc8" opacity=".45"/>
+  <circle cx="200" cy="188" r="86" fill="#fff5d8" opacity=".75" stroke="#5d6d7a" stroke-width="5"/>
+  <circle cx="166" cy="178" r="10" fill="#304050"/><circle cx="234" cy="178" r="10" fill="#304050"/>
+  <path d="M168 222c22 16 42 16 64 0" stroke="#304050" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <text x="200" y="362" text-anchor="middle" font-family="Georgia, serif" font-size="25" font-weight="700" fill="#304050">WATER</text>
+</svg>

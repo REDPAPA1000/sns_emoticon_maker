@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs><radialGradient id="g" cx="35%" cy="25%"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#9ee7ff"/><stop offset="1" stop-color="#3a8dff"/></radialGradient></defs>
+  <rect width="400" height="400" fill="#f3f5ff"/>
+  <ellipse cx="200" cy="312" rx="92" ry="24" fill="#c8cde8"/>
+  <circle cx="200" cy="178" r="106" fill="url(#g)" stroke="#244" stroke-width="8"/>
+  <circle cx="162" cy="174" r="13" fill="#102030"/><circle cx="238" cy="174" r="13" fill="#102030"/>
+  <path d="M170 222c22 16 38 16 60 0" fill="none" stroke="#102030" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="154" cy="132" r="16" fill="#fff" opacity=".65"/>
+  <text x="200" y="364" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#172033">3D TOY</text>
+</svg>

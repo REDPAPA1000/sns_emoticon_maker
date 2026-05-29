@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#f5fbf1"/>
+  <rect x="75" y="92" width="250" height="205" rx="68" fill="#ffe66d" stroke="#171717" stroke-width="10"/>
+  <circle cx="155" cy="181" r="12" fill="#171717"/><circle cx="245" cy="181" r="12" fill="#171717"/>
+  <path d="M168 226c22 18 42 18 64 0" fill="none" stroke="#171717" stroke-width="8" stroke-linecap="round"/>
+  <path d="M112 278l-28 44 62-30" fill="#ffe66d" stroke="#171717" stroke-width="10" stroke-linejoin="round"/>
+  <text x="200" y="358" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#171717">K-MSG</text>
+</svg>

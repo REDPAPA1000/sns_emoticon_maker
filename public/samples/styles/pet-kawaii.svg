@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#f7fff5"/>
+  <path d="M112 126l-34-44 10 86M288 126l34-44-10 86" fill="#ffd7a8" stroke="#171717" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="200" cy="190" r="108" fill="#ffe7c7" stroke="#171717" stroke-width="10"/>
+  <circle cx="160" cy="184" r="12" fill="#171717"/><circle cx="240" cy="184" r="12" fill="#171717"/>
+  <path d="M188 214h24l-12 14z" fill="#171717"/>
+  <path d="M172 242c20 18 36 18 56 0" fill="none" stroke="#171717" stroke-width="7" stroke-linecap="round"/>
+  <text x="200" y="362" text-anchor="middle" font-family="Arial, sans-serif" font-size="27" font-weight="700" fill="#171717">PET</text>
+</svg>

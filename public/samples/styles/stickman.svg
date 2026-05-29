@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#f9fafb"/>
+  <circle cx="200" cy="112" r="42" fill="none" stroke="#171717" stroke-width="10"/>
+  <path d="M200 154v96M200 184l-82 42M200 184l88-28M200 250l-62 70M200 250l76 66" stroke="#171717" stroke-width="11" stroke-linecap="round"/>
+  <path d="M110 118c-28 22-38 50-30 86M292 102c38 12 58 38 60 78" stroke="#ff5858" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <text x="200" y="366" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#171717">STICKMAN</text>
+</svg>

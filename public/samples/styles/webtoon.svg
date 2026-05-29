@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#fff1f1"/>
+  <path d="M78 78h244v220H78z" fill="#fff" stroke="#171717" stroke-width="10"/>
+  <path d="M118 130c34-50 130-48 164 0 26 38 8 132-82 132s-108-94-82-132z" fill="#ffd3bd" stroke="#171717" stroke-width="9"/>
+  <path d="M136 150l38 16M264 150l-38 16" stroke="#171717" stroke-width="9" stroke-linecap="round"/>
+  <path d="M168 218c28-20 44-20 64 0" fill="none" stroke="#171717" stroke-width="8" stroke-linecap="round"/>
+  <path d="M70 66l48 18M330 66l-48 18M200 42v48" stroke="#e53935" stroke-width="12" stroke-linecap="round"/>
+  <text x="200" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#171717">WEBTOON</text>
+</svg>

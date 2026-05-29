@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#f8f8f8"/>
+  <circle cx="200" cy="185" r="112" fill="#ffcf33"/>
+  <circle cx="160" cy="170" r="15" fill="#171717"/><circle cx="240" cy="170" r="15" fill="#171717"/>
+  <path d="M158 224c30 28 54 28 84 0" fill="none" stroke="#171717" stroke-width="14" stroke-linecap="round"/>
+  <path d="M110 98l-20-42 48 18M290 98l20-42-48 18" fill="#ffcf33"/>
+  <text x="200" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#171717">FLAT</text>
+</svg>

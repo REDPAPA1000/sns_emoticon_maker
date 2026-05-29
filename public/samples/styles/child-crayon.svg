@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#fff7f0"/>
+  <circle cx="200" cy="184" r="102" fill="#ffd45b" stroke="#ef6236" stroke-width="16" stroke-dasharray="12 9"/>
+  <circle cx="162" cy="174" r="14" fill="#3b2b20"/><circle cx="238" cy="174" r="14" fill="#3b2b20"/>
+  <path d="M154 224c32 30 60 30 92 0" fill="none" stroke="#3b2b20" stroke-width="12" stroke-linecap="round"/>
+  <path d="M80 310c56-36 112-30 168-8 30 12 54 12 76-2" stroke="#5aa9ff" stroke-width="18" stroke-linecap="round" opacity=".8"/>
+  <text x="200" y="362" text-anchor="middle" font-family="Comic Sans MS, Arial, sans-serif" font-size="26" font-weight="800" fill="#171717">CRAYON</text>
+</svg>

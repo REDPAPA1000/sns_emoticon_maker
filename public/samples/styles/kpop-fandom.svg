@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#fff0fb"/>
+  <circle cx="200" cy="177" r="92" fill="#ffd2dc" stroke="#171717" stroke-width="9"/>
+  <path d="M132 112c28-44 112-44 136 0" fill="none" stroke="#5b2a86" stroke-width="24" stroke-linecap="round"/>
+  <circle cx="166" cy="174" r="10" fill="#171717"/><circle cx="234" cy="174" r="10" fill="#171717"/>
+  <path d="M170 218c22 18 38 18 60 0" fill="none" stroke="#171717" stroke-width="7" stroke-linecap="round"/>
+  <path d="M98 96l16 28 32 4-24 20 8 32-28-16-28 16 8-32-24-20 32-4zM302 90l12 22 26 4-20 16 7 26-25-13-24 13 7-26-20-16 26-4z" fill="#ffcc00"/>
+  <text x="200" y="362" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#171717">FANDOM</text>
+</svg>

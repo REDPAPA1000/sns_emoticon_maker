@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#fff7e8"/>
+  <circle cx="200" cy="168" r="96" fill="#ffd8c2" stroke="#171717" stroke-width="12"/>
+  <path d="M118 120c20-54 112-64 164-8" fill="none" stroke="#6b3f2b" stroke-width="26" stroke-linecap="round"/>
+  <circle cx="166" cy="164" r="11" fill="#171717"/><circle cx="234" cy="164" r="11" fill="#171717"/>
+  <path d="M174 206c18 16 36 16 54 0" fill="none" stroke="#171717" stroke-width="8" stroke-linecap="round"/>
+  <path d="M132 282c24-38 112-38 136 0 12 20-4 42-68 42s-80-22-68-42z" fill="#ff8fb1" stroke="#171717" stroke-width="10"/>
+  <text x="200" y="368" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#171717">CHIBI</text>
+</svg>

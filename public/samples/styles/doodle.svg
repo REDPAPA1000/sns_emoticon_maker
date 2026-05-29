@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#fffdf3"/>
+  <path d="M124 182c-10-68 44-112 104-82 58 28 78 94 32 142-42 46-122 20-136-60z" fill="none" stroke="#171717" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M154 166l24 10M244 162l-22 13M166 226c26 18 48 12 66-12" stroke="#171717" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <path d="M88 272c56-22 118-14 184 20M106 94c-28 10-42 26-42 48" stroke="#ff8c00" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <text x="200" y="358" text-anchor="middle" font-family="Comic Sans MS, Arial, sans-serif" font-size="28" font-weight="700" fill="#171717">DOODLE</text>
+</svg>

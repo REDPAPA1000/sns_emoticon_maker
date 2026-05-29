@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#fff0d8"/>
+  <path d="M82 226c22-94 92-132 174-102 68 24 78 104 22 150-52 42-154 34-196-48z" fill="#ff4f81" stroke="#171717" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 218c44-34 86-52 172-60" stroke="#ffdd00" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="164" cy="194" r="13" fill="#171717"/><circle cx="238" cy="184" r="13" fill="#171717"/>
+  <path d="M172 236c34 20 58 12 82-16" stroke="#171717" stroke-width="9" stroke-linecap="round" fill="none"/>
+  <path d="M72 112l52-20M304 96l40 34M86 304l44 20" stroke="#2ec4b6" stroke-width="14" stroke-linecap="round"/>
+  <text x="200" y="362" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="24" fill="#171717">GRAFFITI</text>
+</svg>
