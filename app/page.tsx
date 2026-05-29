@@ -1,78 +1,318 @@
 'use client';
+
 import { useCallback, useMemo, useState } from 'react';
 import ApiKeyBox from '@/components/ApiKeyBox';
 import ImageUploader from '@/components/ImageUploader';
 import StyleGrid from '@/components/StyleGrid';
 import PlatformGrid from '@/components/PlatformGrid';
 import { STYLES, StickerStyle } from '@/data/styles';
+import { PLATFORMS } from '@/data/platforms';
+import { downloadStickerZip, safeFileName, StickerFile } from '@/lib/zip';
+import { prepareStickerForPlatform, removeLightBackground } from '@/lib/image-processing';
 
 const PHRASES = ['좋아!', '고마워', 'ㅋㅋㅋ', '화이팅', '미안', '대박', '잘자', '인정'];
+
+type GeneratedSticker = {
+  phrase: string;
+  image: string;
+};
 
 export default function Home() {
   const [apiKey, setApiKey] = useState('');
   const [image, setImage] = useState('');
   const [selectedStyle, setSelectedStyle] = useState<StickerStyle>(STYLES[0]);
+  const [selectedPlatformId, setSelectedPlatformId] = useState(PLATFORMS[0].id);
   const [phrase, setPhrase] = useState(PHRASES[0]);
   const [result, setResult] = useState('');
+  const [setResults, setSetResults] = useState<GeneratedSticker[]>([]);
   const [loading, setLoading] = useState(false);
+  const [batchLoading, setBatchLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [removeLightBg, setRemoveLightBg] = useState(true);
+  const [batchProgress, setBatchProgress] = useState('');
   const [error, setError] = useState('');
+
+  const selectedPlatform = useMemo(
+    () => PLATFORMS.find((platform) => platform.id === selectedPlatformId) ?? PLATFORMS[0],
+    [selectedPlatformId]
+  );
+
   const canGenerate = useMemo(() => Boolean(apiKey && image && selectedStyle), [apiKey, image, selectedStyle]);
 
+  const requestSticker = useCallback(async (targetPhrase: string) => {
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey,
+        imageDataUrl: image,
+        stylePrompt: selectedStyle.prompt,
+        phrase: targetPhrase
+      })
+    });
+
+    const json = await response.json();
+
+    if (!response.ok) {
+      throw new Error(json.error || '생성 실패');
+    }
+
+    if (!json.image) {
+      throw new Error('이미지 응답이 없습니다.');
+    }
+
+    const generatedImage = String(json.image);
+    return removeLightBg ? removeLightBackground(generatedImage) : generatedImage;
+  }, [apiKey, image, selectedStyle, removeLightBg]);
+
   const generate = useCallback(async () => {
-    setError(''); setLoading(true); setResult('');
+    setError('');
+    setLoading(true);
+    setResult('');
+
     try {
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apiKey, imageDataUrl: image, stylePrompt: selectedStyle.prompt, phrase })
+      const generated = await requestSticker(phrase);
+      setResult(generated);
+    } catch (event: unknown) {
+      const message = event instanceof Error ? event.message : '오류가 발생했습니다.';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [phrase, requestSticker]);
+
+  const generateSet = useCallback(async () => {
+    setError('');
+    setBatchLoading(true);
+    setSetResults([]);
+    setBatchProgress(`0 / ${PHRASES.length} 생성 준비 중`);
+
+    const nextResults: GeneratedSticker[] = [];
+
+    try {
+      for (let index = 0; index < PHRASES.length; index += 1) {
+        const currentPhrase = PHRASES[index];
+        setBatchProgress(`${index + 1} / ${PHRASES.length} 생성 중: ${currentPhrase}`);
+        const generated = await requestSticker(currentPhrase);
+        nextResults.push({ phrase: currentPhrase, image: generated });
+        setSetResults([...nextResults]);
+      }
+
+      setBatchProgress(`${PHRASES.length} / ${PHRASES.length} 생성 완료`);
+    } catch (event: unknown) {
+      const message = event instanceof Error ? event.message : '세트 생성 중 오류가 발생했습니다.';
+      setError(message);
+      setBatchProgress('생성 실패');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [requestSticker]);
+
+  const downloadOriginalSet = useCallback(async () => {
+    try {
+      const files: StickerFile[] = setResults.map((item, index) => ({
+        fileName: `${String(index + 1).padStart(2, '0')}_${selectedStyle.id}_${safeFileName(item.phrase)}.png`,
+        dataUrl: item.image
+      }));
+
+      await downloadStickerZip(files, `sns-${selectedStyle.id}-original-8set.zip`);
+    } catch (event: unknown) {
+      const message = event instanceof Error ? event.message : 'ZIP 다운로드 중 오류가 발생했습니다.';
+      setError(message);
+    }
+  }, [selectedStyle.id, setResults]);
+
+  const downloadPlatformSet = useCallback(async () => {
+    setError('');
+    setExportLoading(true);
+
+    try {
+      const files: StickerFile[] = [];
+
+      for (let index = 0; index < setResults.length; index += 1) {
+        const item = setResults[index];
+        const resized = await prepareStickerForPlatform(item.image, {
+          width: selectedPlatform.width,
+          height: selectedPlatform.height,
+          removeLightBg,
+          paddingRatio: 0.88
+        });
+
+        files.push({
+          fileName: `${String(index + 1).padStart(2, '0')}_${selectedPlatform.id}_${selectedStyle.id}_${safeFileName(item.phrase)}.png`,
+          dataUrl: resized
+        });
+      }
+
+      await downloadStickerZip(files, `${selectedPlatform.id}-${selectedStyle.id}-${selectedPlatform.width}x${selectedPlatform.height}-8set.zip`);
+    } catch (event: unknown) {
+      const message = event instanceof Error ? event.message : '플랫폼 ZIP 변환 중 오류가 발생했습니다.';
+      setError(message);
+    } finally {
+      setExportLoading(false);
+    }
+  }, [removeLightBg, selectedPlatform, selectedStyle.id, setResults]);
+
+  const downloadPlatformSingle = useCallback(async () => {
+    if (!result) return;
+    setError('');
+    setExportLoading(true);
+
+    try {
+      const resized = await prepareStickerForPlatform(result, {
+        width: selectedPlatform.width,
+        height: selectedPlatform.height,
+        removeLightBg,
+        paddingRatio: 0.88
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || '생성 실패');
-      setResult(json.image);
-    } catch (e:any) {
-      setError(e.message || '오류가 발생했습니다.');
-    } finally { setLoading(false); }
-  }, [apiKey, image, selectedStyle, phrase]);
 
-  return <main className="container">
-    <section className="hero">
-      <span className="badge">무료 BYOK · SNS Sticker Generator</span>
-      <h1>SNS 이모티콘 메이커</h1>
-      <p>사용자가 자신의 Gemini API 키를 넣고, 이미지를 업로드한 뒤 원하는 스타일을 선택해 카톡·텔레그램·왓츠앱·디스코드·LINE·인스타그램용 스티커를 제작하는 무료 웹앱입니다.</p>
-    </section>
+      await downloadStickerZip([
+        {
+          fileName: `single_${selectedPlatform.id}_${selectedStyle.id}_${safeFileName(phrase)}.png`,
+          dataUrl: resized
+        }
+      ], `single-${selectedPlatform.id}-${selectedStyle.id}.zip`);
+    } catch (event: unknown) {
+      const message = event instanceof Error ? event.message : '대표 이미지 변환 중 오류가 발생했습니다.';
+      setError(message);
+    } finally {
+      setExportLoading(false);
+    }
+  }, [phrase, removeLightBg, result, selectedPlatform, selectedStyle.id]);
 
-    <section className="section grid grid-2">
-      <ApiKeyBox onChange={setApiKey} />
-      <ImageUploader onImage={setImage} />
-    </section>
+  return (
+    <main className="container">
+      <section className="hero">
+        <span className="badge">무료 BYOK · SNS Sticker Generator</span>
+        <h1>SNS 이모티콘 메이커</h1>
+        <p>
+          사용자가 자신의 Gemini API 키를 넣고, 이미지를 업로드한 뒤 원하는 스타일을 선택해
+          카톡·텔레그램·왓츠앱·디스코드·LINE·인스타그램용 스티커를 제작하는 무료 웹앱입니다.
+        </p>
+      </section>
 
-    <section className="section grid grid-2">
-      <div className="card">
-        <h3>3. 원본 / 결과 미리보기</h3>
-        <div className="preview-box">
-          {result ? <img src={result} alt="generated sticker" /> : image ? <img src={image} alt="uploaded image" /> : <p className="small">이미지를 업로드하면 여기에 표시됩니다.</p>}
+      <section className="section grid grid-2">
+        <ApiKeyBox onChange={setApiKey} />
+        <ImageUploader onImage={setImage} />
+      </section>
+
+      <section className="section grid grid-2">
+        <div className="card">
+          <h3>3. 원본 / 대표 결과 미리보기</h3>
+          <div className="preview-box">
+            {result ? (
+              <img src={result} alt="generated sticker" />
+            ) : image ? (
+              <img src={image} alt="uploaded image" />
+            ) : (
+              <p className="small">이미지를 업로드하면 여기에 표시됩니다.</p>
+            )}
+          </div>
+          {result && (
+            <div className="button-row">
+              <a className="btn" href={result} download={`sns-sticker-${selectedStyle.id}.png`}>대표 PNG 다운로드</a>
+              <button className="btn secondary" disabled={exportLoading} onClick={downloadPlatformSingle}>대표 플랫폼 ZIP</button>
+            </div>
+          )}
         </div>
-        {result && <a className="btn" style={{display:'inline-block', marginTop:12, textDecoration:'none'}} href={result} download={`sns-sticker-${selectedStyle.id}.png`}>PNG 다운로드</a>}
-      </div>
-      <div className="card">
-        <h3>4. 대표 이모티콘 생성</h3>
-        <p className="small">처음에는 선택한 스타일 1개만 생성합니다. 전체 24종/32종 세트 생성은 다음 단계에서 추가합니다.</p>
-        <select className="input" value={phrase} onChange={e=>setPhrase(e.target.value)}>
-          {PHRASES.map(p => <option key={p}>{p}</option>)}
-        </select>
-        <button className="btn" style={{marginTop:12}} disabled={!canGenerate || loading} onClick={generate}>{loading ? '생성 중...' : `${selectedStyle.name} 스타일로 생성`}</button>
-        {error && <p className="small" style={{color:'#b00020'}}>{error}</p>}
-      </div>
-    </section>
 
-    <section className="section">
-      <h2>스타일 라이브러리</h2>
-      <StyleGrid selected={selectedStyle.id} onSelect={setSelectedStyle} />
-    </section>
+        <div className="card">
+          <h3>4. 대표 이모티콘 / 8종 세트 생성</h3>
+          <p className="small">대표 1장 생성 또는 기본 문구 8종을 순차 생성해 ZIP으로 다운로드할 수 있습니다.</p>
+          <label className="label">문구 선택</label>
+          <select className="input" value={phrase} onChange={(event) => setPhrase(event.target.value)}>
+            {PHRASES.map((item) => (
+              <option key={item}>{item}</option>
+            ))}
+          </select>
 
-    <section className="section">
-      <h2>플랫폼 내보내기 목표</h2>
-      <PlatformGrid />
-    </section>
-  </main>;
+          <label className="check-row">
+            <input type="checkbox" checked={removeLightBg} onChange={(event) => setRemoveLightBg(event.target.checked)} />
+            <span>밝은 배경 자동 투명 처리</span>
+          </label>
+
+          <div className="button-row">
+            <button className="btn" disabled={!canGenerate || loading || batchLoading} onClick={generate}>
+              {loading ? '생성 중...' : `${selectedStyle.name} 대표 1장`}
+            </button>
+            <button className="btn secondary" disabled={!canGenerate || loading || batchLoading} onClick={generateSet}>
+              {batchLoading ? '8종 생성 중...' : '8종 세트 생성'}
+            </button>
+          </div>
+
+          {batchProgress && <p className="small">{batchProgress}</p>}
+          {error && <p className="small error-text">{error}</p>}
+        </div>
+      </section>
+
+      <section className="section grid grid-2">
+        <div className="card">
+          <h3>5. 플랫폼 내보내기</h3>
+          <p className="small">생성된 이미지를 선택한 플랫폼 규격으로 중앙 배치·리사이즈한 뒤 ZIP으로 저장합니다.</p>
+          <label className="label">플랫폼 선택</label>
+          <select className="input" value={selectedPlatformId} onChange={(event) => setSelectedPlatformId(event.target.value)}>
+            {PLATFORMS.map((platform) => (
+              <option key={platform.id} value={platform.id}>{platform.name} · {platform.size}</option>
+            ))}
+          </select>
+          <p className="small selected-platform">
+            현재 선택: <b>{selectedPlatform.name}</b> · {selectedPlatform.width}×{selectedPlatform.height} PNG
+          </p>
+          <div className="button-row">
+            <button className="btn" disabled={setResults.length === 0 || batchLoading || exportLoading} onClick={downloadPlatformSet}>
+              {exportLoading ? '변환 중...' : '8종 플랫폼 ZIP'}
+            </button>
+            <button className="btn secondary" disabled={setResults.length === 0 || batchLoading || exportLoading} onClick={downloadOriginalSet}>
+              원본 8종 ZIP
+            </button>
+          </div>
+        </div>
+
+        <div className="card">
+          <h3>현재 기능 상태</h3>
+          <ul className="small status-list">
+            <li>Gemini BYOK 방식: 구현</li>
+            <li>8종 문구 일괄 생성: 구현</li>
+            <li>ZIP 다운로드: 구현</li>
+            <li>플랫폼별 리사이즈: 구현</li>
+            <li>밝은 배경 투명 처리: 1차 구현</li>
+            <li>정밀 인물 배경 제거: 추후 API 연동 필요</li>
+          </ul>
+        </div>
+      </section>
+
+      {setResults.length > 0 && (
+        <section className="section">
+          <h2>8종 생성 결과</h2>
+          <div className="grid grid-4">
+            {setResults.map((item, index) => (
+              <div className="card" key={`${item.phrase}-${index}`}>
+                <div className="thumb-box">
+                  <img src={item.image} alt={`${item.phrase} sticker`} />
+                </div>
+                <strong>{index + 1}. {item.phrase}</strong>
+                <a
+                  className="small"
+                  href={item.image}
+                  download={`${String(index + 1).padStart(2, '0')}_${selectedStyle.id}_${safeFileName(item.phrase)}.png`}
+                >
+                  개별 PNG 다운로드
+                </a>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="section">
+        <h2>스타일 라이브러리</h2>
+        <StyleGrid selected={selectedStyle.id} onSelect={setSelectedStyle} />
+      </section>
+
+      <section className="section">
+        <h2>플랫폼 내보내기 목표</h2>
+        <PlatformGrid />
+      </section>
+    </main>
+  );
 }
