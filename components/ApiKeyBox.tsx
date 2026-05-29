@@ -11,7 +11,7 @@ type ApiKeyBoxProps = {
 export default function ApiKeyBox({ onChange }: ApiKeyBoxProps) {
   const [key, setKey] = useState('');
   const [checking, setChecking] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'valid' | 'invalid'>('idle');
+  const [status, setStatus] = useState<'idle' | 'valid' | 'invalid' | 'unknown'>('idle');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -39,13 +39,13 @@ export default function ApiKeyBox({ onChange }: ApiKeyBoxProps) {
 
     if (!trimmed) {
       setStatus('invalid');
-      setMessage('Gemini API Key를 먼저 입력해 주세요.');
+      setMessage('API Key를 먼저 입력해 주세요.');
       return;
     }
 
-    if (!trimmed.startsWith('AIza')) {
+    if (trimmed.length < 20) {
       setStatus('invalid');
-      setMessage('Gemini API Key는 보통 AIza로 시작합니다. 복사한 키를 다시 확인해 주세요.');
+      setMessage('API Key가 너무 짧습니다. 복사한 키 전체를 붙여넣어 주세요.');
       return;
     }
 
@@ -59,20 +59,28 @@ export default function ApiKeyBox({ onChange }: ApiKeyBoxProps) {
       });
       const json = await response.json();
 
-      if (!response.ok || !json.valid) {
-        throw new Error(json.error || 'API Key가 유효하지 않습니다.');
+      if (!response.ok || json.status === 'invalid') {
+        throw new Error(json.error || 'API Key를 확인해 주세요.');
       }
 
-      setStatus('valid');
-      setMessage('API Key가 정상적으로 확인되었습니다.');
+      if (json.status === 'valid') {
+        setStatus('valid');
+        setMessage(json.message || 'API Key가 정상적으로 확인되었습니다.');
+        return;
+      }
+
+      setStatus('unknown');
+      setMessage(json.warning || '키 길이는 충분합니다. 실제 이미지 생성으로 최종 확인해 주세요.');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'API Key 검증 중 오류가 발생했습니다.';
-      setStatus('invalid');
-      setMessage(errorMessage);
+      setStatus('unknown');
+      setMessage(`${errorMessage} 그래도 키 길이는 충분하다면 실제 생성으로 확인할 수 있습니다.`);
     } finally {
       setChecking(false);
     }
   }
+
+  const messageClass = status === 'invalid' ? 'error-text' : status === 'valid' ? 'success-text' : 'warning-text';
 
   return (
     <div className="card">
@@ -85,23 +93,21 @@ export default function ApiKeyBox({ onChange }: ApiKeyBoxProps) {
         className="input"
         value={key}
         onChange={(event) => save(event.target.value)}
-        placeholder="AIza..."
+        placeholder="Google AI Studio에서 발급한 API Key 붙여넣기"
         type="password"
         autoComplete="off"
       />
 
       <div className="button-row">
         <button className="btn secondary" type="button" disabled={checking} onClick={validateKey}>
-          {checking ? '검사 중...' : 'API Key 유효성 검사'}
+          {checking ? '검사 중...' : 'API Key 간단 확인'}
         </button>
         <a className="btn" href={AI_STUDIO_KEY_URL} target="_blank" rel="noreferrer">
           Gemini API Key 발급
         </a>
       </div>
 
-      {message && (
-        <p className={`small ${status === 'invalid' ? 'error-text' : 'success-text'}`}>{message}</p>
-      )}
+      {message && <p className={`small ${messageClass}`}>{message}</p>}
 
       <details className="helper-box">
         <summary>Gemini API Key가 뭔가요?</summary>
@@ -109,7 +115,7 @@ export default function ApiKeyBox({ onChange }: ApiKeyBoxProps) {
           <li>Google AI Studio에 접속합니다.</li>
           <li>Google 계정으로 로그인합니다.</li>
           <li>Create API key를 눌러 키를 발급합니다.</li>
-          <li>발급된 AIza... 형태의 키를 이 칸에 붙여넣습니다.</li>
+          <li>발급된 API Key를 이 칸에 붙여넣습니다.</li>
         </ol>
         <p className="small">API Key는 비밀번호처럼 다뤄야 합니다. 다른 사람에게 공유하지 마세요.</p>
       </details>
