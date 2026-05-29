@@ -124,119 +124,80 @@ export default function Home() {
 
   const readiness = [
     { label: 'API Key', value: apiKeyStatus === 'valid' ? '유효' : '검증 필요', ready: apiKeyStatus === 'valid' },
-    { label: '원본 이미지', value: image ? '업로드 완료' : '대기', ready: Boolean(image) },
+    { label: '이미지', value: image ? '업로드 완료' : '대기', ready: Boolean(image) },
     { label: '스타일', value: selectedStyle.name, ready: Boolean(selectedStyle) }
   ];
 
   return (
     <main className="app-shell">
-      <aside className="sidebar">
-        <div className="brand">
-          <span className="brand-dot" />
-          <span>SNS Emoticon Maker</span>
-        </div>
-        <nav className="side-steps" aria-label="작업 단계">
-          <a href="#key">1. API Key</a>
-          <a href="#source">2. 이미지</a>
-          <a href="#style">3. 스타일</a>
-          <a href="#result">4. 생성 결과</a>
-          <a href="#export">5. 저장</a>
-        </nav>
-      </aside>
-
       <section className="workspace">
         <header className="topbar">
-          <div>
-            <span className="page-kicker">REDPAPA WEB APP</span>
-            <h1>사진 한 장으로 SNS 이모티콘 8종 만들기</h1>
+          <div className="brand inline-brand">
+            <span className="brand-dot" />
+            <span>SNS Emoticon Maker</span>
           </div>
           <span className={`status-badge ${apiKeyStatus}`}>
             API Key {apiKeyStatus === 'valid' ? '유효' : apiKeyStatus === 'invalid' ? '실패' : apiKeyStatus === 'checking' ? '검증 중' : '대기'}
           </span>
         </header>
 
-        <div className="workflow-grid">
-          <div className="workflow-main">
-            <div id="key">
-              <ApiKeyBox onChange={setApiKey} onStatusChange={setApiKeyStatus} />
-            </div>
+        <section className="page-title">
+          <span className="page-kicker">REDPAPA WEB APP</span>
+          <h1>사진 한 장으로 SNS 이모티콘 8종 만들기</h1>
+        </section>
 
-            <div id="source">
-              <ImageUploader image={image} onImage={setImage} />
-            </div>
-
-            <section id="style" className={`panel ${image ? '' : 'panel-disabled'}`}>
-              <div className="panel-header">
-                <div>
-                  <span className="step-label">STEP 3</span>
-                  <h2>스타일 선택</h2>
-                </div>
-                <span className="small">12개 스타일</span>
-              </div>
-              <StyleGrid selected={selectedStyle.id} onSelect={setSelectedStyle} disabled={!image} />
-              <p className="small style-note">
-                실제 메신저에서 쓰기 좋은 캐릭터, 반응, 문구형 스타일만 남겼습니다.
-              </p>
-            </section>
-          </div>
-
-          <aside className="result-column">
-            <section className="panel action-panel">
-              <div className="panel-header">
-                <div>
-                  <span className="step-label">STEP 4</span>
-                  <h2>8종 자동 생성</h2>
-                </div>
-              </div>
-              <div className="summary-list">
-                {readiness.map((item) => (
-                  <span className={item.ready ? 'ready' : ''} key={item.label}>
-                    <b>{item.label}</b>
-                    <em>{item.value}</em>
-                  </span>
-                ))}
-              </div>
-              <label className="check-row">
-                <input type="checkbox" checked={removeLightBg} onChange={(event) => setRemoveLightBg(event.target.checked)} />
-                <span>밝은 배경 자동 투명 처리</span>
-              </label>
-              <button className="btn full" disabled={!canGenerate} onClick={generateSet}>
-                {batchLoading ? '생성 중...' : '8종 생성'}
-              </button>
-              {batchProgress && (
-                <div className="progress-block">
-                  <div className="progress-track"><span style={{ width: `${progressPercent}%` }} /></div>
-                  <p className="small">{batchProgress}</p>
-                </div>
-              )}
-              {error && <p className="small error-text">{error}</p>}
-            </section>
-
-            <section id="export" className="panel export-panel">
-              <div className="panel-header">
-                <div>
-                  <span className="step-label">STEP 5</span>
-                  <h2>SNS 규격 저장</h2>
-                </div>
-              </div>
-              <label className="input-label" htmlFor="platform-select">저장 규격</label>
-              <select
-                id="platform-select"
-                className="input"
-                value={selectedPlatformId}
-                onChange={(event) => setSelectedPlatformId(event.target.value)}
-              >
-                {PLATFORMS.map((platform) => (
-                  <option key={platform.id} value={platform.id}>{platform.name} · {platform.size}</option>
-                ))}
-              </select>
-              <p className="small platform-note">{selectedPlatform.note}</p>
-              <button className="btn full" disabled={setResults.length === 0 || batchLoading || exportLoading} onClick={downloadPlatformSet}>
-                {exportLoading ? 'ZIP 생성 중...' : `${selectedPlatform.name} ZIP 다운로드`}
-              </button>
-            </section>
-          </aside>
+        <div id="key">
+          <ApiKeyBox onChange={setApiKey} onStatusChange={setApiKeyStatus} />
         </div>
+
+        <div id="source">
+          <ImageUploader image={image} onImage={setImage} />
+        </div>
+
+        <section id="style" className={`panel ${image ? '' : 'panel-disabled'}`}>
+          <div className="panel-header">
+            <div>
+              <span className="step-label">STEP 3</span>
+              <h2>스타일 선택</h2>
+            </div>
+            <span className="small">12개 스타일</span>
+          </div>
+          <StyleGrid selected={selectedStyle.id} onSelect={setSelectedStyle} disabled={!image} />
+          <p className="small style-note">
+            실제 메신저에서 쓰기 좋은 캐릭터, 반응, 문구형 스타일만 남겼습니다.
+          </p>
+        </section>
+
+        <section className="panel action-panel">
+          <div className="panel-header">
+            <div>
+              <span className="step-label">STEP 4</span>
+              <h2>8종 자동 생성</h2>
+            </div>
+          </div>
+          <div className="summary-list compact-summary">
+            {readiness.map((item) => (
+              <span className={item.ready ? 'ready' : ''} key={item.label}>
+                <b>{item.label}</b>
+                <em>{item.value}</em>
+              </span>
+            ))}
+          </div>
+          <label className="check-row">
+            <input type="checkbox" checked={removeLightBg} onChange={(event) => setRemoveLightBg(event.target.checked)} />
+            <span>밝은 배경 자동 투명 처리</span>
+          </label>
+          <button className="btn full primary-action" disabled={!canGenerate} onClick={generateSet}>
+            {batchLoading ? '생성 중...' : '8종 생성'}
+          </button>
+          {batchProgress && (
+            <div className="progress-block">
+              <div className="progress-track"><span style={{ width: `${progressPercent}%` }} /></div>
+              <p className="small">{batchProgress}</p>
+            </div>
+          )}
+          {error && <p className="small error-text">{error}</p>}
+        </section>
 
         <section id="result" className="panel results-panel">
           <div className="panel-header result-tools">
@@ -264,6 +225,33 @@ export default function Home() {
               </div>
             )}
           </div>
+        </section>
+
+        <section id="export" className="panel export-panel">
+          <div className="panel-header">
+            <div>
+              <span className="step-label">STEP 5</span>
+              <h2>SNS 규격 저장</h2>
+            </div>
+          </div>
+          <div className="export-controls">
+            <label>
+              <span className="input-label">저장 규격</span>
+              <select
+                className="input"
+                value={selectedPlatformId}
+                onChange={(event) => setSelectedPlatformId(event.target.value)}
+              >
+                {PLATFORMS.map((platform) => (
+                  <option key={platform.id} value={platform.id}>{platform.name} · {platform.size}</option>
+                ))}
+              </select>
+            </label>
+            <button className="btn full" disabled={setResults.length === 0 || batchLoading || exportLoading} onClick={downloadPlatformSet}>
+              {exportLoading ? 'ZIP 생성 중...' : `${selectedPlatform.name} ZIP 다운로드`}
+            </button>
+          </div>
+          <p className="small platform-note">{selectedPlatform.note}</p>
         </section>
       </section>
     </main>
