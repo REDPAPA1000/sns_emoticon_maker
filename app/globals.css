@@ -21,12 +21,12 @@ p { line-height:1.65; }
 .btn { border:0; padding:13px 16px; border-radius:14px; background:#111; color:white; cursor:pointer; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
 .btn.secondary { background:#efe8de; color:#222; }
 .btn:disabled { opacity:.5; cursor:not-allowed; }
-.style-card { border:1px solid #eee6dc; border-radius:20px; padding:0; cursor:pointer; background:white; transition:.15s; text-align:left; overflow:hidden; display:flex; flex-direction:column; min-height:100%; }
-.style-card:hover, .style-card.active { border-color:#111; transform:translateY(-2px); box-shadow:0 12px 34px rgba(0,0,0,.08); }
-.style-preview { width:100%; aspect-ratio:1/1; display:grid; place-items:center; background:#faf6ef; border-bottom:1px solid #eee6dc; }
+.style-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(92px, 1fr)); gap:10px; }
+.style-card { border:1px solid #e7ded2; border-radius:12px; padding:7px; cursor:pointer; background:white; transition:.15s; text-align:center; overflow:hidden; display:grid; gap:6px; min-width:0; }
+.style-card:hover, .style-card.active { border-color:#111; transform:translateY(-1px); box-shadow:0 8px 20px rgba(0,0,0,.08); }
+.style-preview { width:100%; aspect-ratio:1/1; display:grid; place-items:center; background:#faf6ef; border-radius:9px; overflow:hidden; }
 .style-preview img { width:100%; height:100%; object-fit:cover; display:block; }
-.style-meta { display:grid; gap:8px; padding:14px; }
-.style-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.style-name { font-size:12px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .preview-box { min-height:260px; display:grid; place-items:center; border:2px dashed #d9cfc2; border-radius:24px; overflow:hidden; background:#fffaf3; }
 .preview-box img { max-width:100%; max-height:320px; object-fit:contain; }
 .thumb-box { width:100%; aspect-ratio:1/1; display:grid; place-items:center; border-radius:18px; background:#fffaf3; border:1px solid #efe7dc; overflow:hidden; margin-bottom:12px; }

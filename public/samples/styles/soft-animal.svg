@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220">
+  <rect width="220" height="220" fill="#f6fff0"/>
+  <path d="M72 72l-22-28 6 50M148 72l22-28-6 50" fill="#ffd7a3" stroke="#2a211c" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="110" cy="108" r="62" fill="#ffe7bf" stroke="#2a211c" stroke-width="7"/>
+  <circle cx="88" cy="105" r="6" fill="#2a211c"/><circle cx="132" cy="105" r="6" fill="#2a211c"/>
+  <path d="M101 121h18l-9 9z" fill="#2a211c"/>
+  <path d="M90 145c14 10 26 10 40 0" fill="none" stroke="#2a211c" stroke-width="5" stroke-linecap="round"/>
+  <text x="110" y="199" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="800" fill="#2a211c">귀여워</text>
+</svg>

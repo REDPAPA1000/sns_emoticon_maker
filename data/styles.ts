@@ -1,174 +1,133 @@
 export type StickerStyle = {
   id: string;
   name: string;
-  group: 'cute' | 'meme' | 'art' | 'trend' | 'minimal' | 'pet';
+  group: 'market' | 'animal' | 'message' | 'reaction' | 'daily' | 'fan';
   description: string;
   bestFor: string;
   sampleImage: string;
+  referenceUrl: string;
   prompt: string;
 };
 
 export const STYLES: StickerStyle[] = [
   {
-    id: 'chibi',
-    name: 'Chibi',
-    group: 'cute',
-    description: 'Big head, small body, bright cute proportions.',
-    bestFor: 'People, idols, characters',
-    sampleImage: '/samples/styles/chibi.svg',
-    prompt: 'cute chibi sticker, big head, small body, kawaii, clean white outline, transparent background, expressive face'
+    id: 'mini-character',
+    name: '미니 캐릭터',
+    group: 'market',
+    description: '작고 가볍게 쓰는 미니 이모티콘형 캐릭터.',
+    bestFor: '일상 대화',
+    sampleImage: '/samples/styles/mini-character.svg',
+    referenceUrl: 'https://e.kakao.com/search',
+    prompt: 'small mini emoticon character, compact cute proportions, simple silhouette, clean transparent background, optimized for KakaoTalk chat'
   },
   {
-    id: 'korean-messenger',
-    name: 'K-Messenger',
-    group: 'cute',
-    description: 'Soft rounded messenger sticker with simple emotion.',
-    bestFor: 'Daily chat reactions',
-    sampleImage: '/samples/styles/korean-messenger.svg',
-    prompt: 'simple rounded character, soft color palette, minimal facial features, cute korean messenger sticker style, clean outline, transparent background'
+    id: 'soft-animal',
+    name: '말랑 동물',
+    group: 'animal',
+    description: '햄스터, 강아지, 고양이처럼 호감도 높은 동물형.',
+    bestFor: '반려동물 사진',
+    sampleImage: '/samples/styles/soft-animal.svg',
+    referenceUrl: 'https://e.kakao.com/search',
+    prompt: 'soft cute animal sticker, round friendly face, warm Korean messenger emoticon style, expressive pose, transparent background'
   },
   {
-    id: 'line-mascot',
-    name: 'Mascot',
-    group: 'cute',
-    description: 'Bold mascot look with clear outline and readable pose.',
-    bestFor: 'Brand-like sticker sets',
-    sampleImage: '/samples/styles/line-mascot.svg',
-    prompt: 'bold outline cute mascot, high contrast, funny expression, sticker pack style, transparent background'
+    id: 'small-gray-cat',
+    name: '회색 고양이',
+    group: 'animal',
+    description: '무심하고 귀여운 고양이 리액션 스타일.',
+    bestFor: '시크한 반응',
+    sampleImage: '/samples/styles/small-gray-cat.svg',
+    referenceUrl: 'https://e.kakao.com/search',
+    prompt: 'small gray cat sticker, calm deadpan expression, cute but dry humor, clean outline, transparent background'
   },
   {
-    id: 'webtoon',
-    name: 'Webtoon',
-    group: 'art',
-    description: 'Comic-panel expression with dramatic Korean webtoon energy.',
-    bestFor: 'Strong emotion scenes',
-    sampleImage: '/samples/styles/webtoon.svg',
-    prompt: 'korean webtoon character, comic expression, dramatic emotion, clean sticker format, transparent background'
+    id: 'hamster-reaction',
+    name: '햄스터 리액션',
+    group: 'animal',
+    description: '표정이 잘 보이는 둥근 햄스터 리액션.',
+    bestFor: '귀여운 감정표현',
+    sampleImage: '/samples/styles/hamster-reaction.svg',
+    referenceUrl: 'https://e.kakao.com/item/hot',
+    prompt: 'round hamster reaction sticker, chubby cheeks, exaggerated cute emotion, Korean chat sticker style, transparent background'
   },
   {
-    id: 'toy-3d',
-    name: '3D Toy',
-    group: 'trend',
-    description: 'Glossy toy figure with soft lighting and rounded depth.',
-    bestFor: 'Trendy profile stickers',
-    sampleImage: '/samples/styles/toy-3d.svg',
-    prompt: '3d toy character, cute vinyl figure, soft lighting, rounded shape, high detail, transparent background'
+    id: 'yellow-dog',
+    name: '누렁이 감성',
+    group: 'animal',
+    description: '친근한 강아지 캐릭터형 생활 이모티콘.',
+    bestFor: '친구 대화',
+    sampleImage: '/samples/styles/yellow-dog.svg',
+    referenceUrl: 'https://e.kakao.com/search',
+    prompt: 'friendly yellow dog character sticker, simple cute face, casual Korean emoticon style, daily chat expression, transparent background'
   },
   {
-    id: 'meme-reaction',
-    name: 'Meme Reaction',
-    group: 'meme',
-    description: 'Exaggerated reaction image for humorous replies.',
-    bestFor: 'SNS comments and jokes',
-    sampleImage: '/samples/styles/meme-reaction.svg',
-    prompt: 'funny meme sticker, reaction image, exaggerated facial expression, absurd humor, transparent background'
+    id: 'polite-message',
+    name: '공손 메시지',
+    group: 'message',
+    description: '감사, 확인, 부탁처럼 문구가 중심인 스타일.',
+    bestFor: '직장/가족 대화',
+    sampleImage: '/samples/styles/polite-message.svg',
+    referenceUrl: 'https://e.kakao.com/item/hot',
+    prompt: 'polite Korean message sticker, cute character holding readable text sign, clean typography, warm tone, transparent background'
   },
   {
-    id: 'pet-kawaii',
-    name: 'Pet Kawaii',
-    group: 'pet',
-    description: 'Soft animal-focused sticker with cute expression.',
-    bestFor: 'Dogs, cats, pet photos',
-    sampleImage: '/samples/styles/pet-kawaii.svg',
-    prompt: 'cute pet sticker, kawaii animal, expressive face, clean sticker cut, transparent background'
+    id: 'work-life',
+    name: '사회생활',
+    group: 'daily',
+    description: '회사, 학교, 단톡방에서 쓰기 좋은 현실 리액션.',
+    bestFor: '업무/단체방',
+    sampleImage: '/samples/styles/work-life.svg',
+    referenceUrl: 'https://e.kakao.com/search',
+    prompt: 'office life reaction sticker, tired but cute character, polite social expression, Korean workplace chat humor, transparent background'
   },
   {
-    id: 'flat-emoji',
-    name: 'Flat Emoji',
-    group: 'minimal',
-    description: 'Simple flat vector style with clear emoji readability.',
-    bestFor: 'Small icons and quick reactions',
-    sampleImage: '/samples/styles/flat-emoji.svg',
-    prompt: 'flat design, simple emoji character, clean vector look, minimal details, transparent background'
+    id: 'couple-heart',
+    name: '커플 하트',
+    group: 'daily',
+    description: '사랑, 애정, 삐짐을 말랑하게 표현하는 커플형.',
+    bestFor: '커플 대화',
+    sampleImage: '/samples/styles/couple-heart.svg',
+    referenceUrl: 'https://e.kakao.com/t/true-love',
+    prompt: 'cute couple sticker, soft heart mood, affectionate Korean chat emoticon, rounded characters, transparent background'
   },
   {
-    id: 'kpop-fandom',
-    name: 'K-Pop Fandom',
-    group: 'trend',
-    description: 'Cheering pose, sparkles, and fan-sign energy.',
-    bestFor: 'Fan accounts and support sets',
-    sampleImage: '/samples/styles/kpop-fandom.svg',
-    prompt: 'kpop fan sticker, cute cheering pose, sparkles, fandom expression, transparent background'
+    id: 'meme-jjal',
+    name: '짤 반응',
+    group: 'reaction',
+    description: '과장된 표정과 짧은 문구로 바로 쓰는 짤 스타일.',
+    bestFor: '친구방/댓글',
+    sampleImage: '/samples/styles/meme-jjal.svg',
+    referenceUrl: 'https://e.kakao.com/search',
+    prompt: 'Korean meme reaction sticker, exaggerated funny expression, short readable Korean caption, clean sticker cutout, transparent background'
   },
   {
-    id: 'doodle',
-    name: 'Doodle',
-    group: 'meme',
-    description: 'Loose hand-drawn lines with casual charm.',
-    bestFor: 'Low-effort funny stickers',
-    sampleImage: '/samples/styles/doodle.svg',
-    prompt: 'hand drawn doodle, rough sketch, messy lines, simple expression, intentionally careless funny sticker, transparent background'
+    id: 'big-text',
+    name: '큰글씨 톡',
+    group: 'message',
+    description: '큰 문구와 작은 캐릭터를 결합한 즉답형.',
+    bestFor: '축하/답장',
+    sampleImage: '/samples/styles/big-text.svg',
+    referenceUrl: 'https://e.kakao.com/style/group/12?sort=HOT&t_obj=search_style',
+    prompt: 'large Korean text sticker, bold readable lettering, small cute accent character, KakaoTalk big emoticon style, transparent background'
   },
   {
-    id: 'child-crayon',
-    name: 'Crayon',
-    group: 'art',
-    description: 'Childlike crayon texture with imperfect coloring.',
-    bestFor: 'Warm, playful concepts',
-    sampleImage: '/samples/styles/child-crayon.svg',
-    prompt: 'child drawing style, crayon illustration, cute and innocent, imperfect coloring, transparent background'
+    id: 'hand-drawn-talk',
+    name: '낙서톡',
+    group: 'reaction',
+    description: '일부러 가볍게 그린 듯한 친근한 손그림.',
+    bestFor: '가벼운 농담',
+    sampleImage: '/samples/styles/hand-drawn-talk.svg',
+    referenceUrl: 'https://e.kakao.com/style/group/12?sort=HOT&t_obj=search_style',
+    prompt: 'casual hand drawn Korean doodle sticker, friendly messy lines, readable expression, transparent background'
   },
   {
-    id: 'stickman',
-    name: 'Stickman',
-    group: 'meme',
-    description: 'Minimal stick figure pose with readable action.',
-    bestFor: 'Fast reaction sets',
-    sampleImage: '/samples/styles/stickman.svg',
-    prompt: 'stickman character, simple black lines, funny pose, reaction sticker, transparent background'
-  },
-  {
-    id: 'pixel',
-    name: 'Pixel Art',
-    group: 'trend',
-    description: 'Retro game-like pixel sticker with blocky details.',
-    bestFor: 'Gaming and retro themes',
-    sampleImage: '/samples/styles/pixel.svg',
-    prompt: 'pixel art character, 8 bit game style, retro sticker, cute animation frame, transparent background'
-  },
-  {
-    id: 'paper-cutout',
-    name: 'Paper Cutout',
-    group: 'art',
-    description: 'Layered paper collage with handmade depth.',
-    bestFor: 'Crafty, editorial stickers',
-    sampleImage: '/samples/styles/paper-cutout.svg',
-    prompt: 'paper cutout art, handmade collage, layered paper texture, cute sticker, transparent background'
-  },
-  {
-    id: 'clay',
-    name: 'Clay',
-    group: 'trend',
-    description: 'Soft clay sculpture look with tactile texture.',
-    bestFor: 'Cute object and mascot sets',
-    sampleImage: '/samples/styles/clay.svg',
-    prompt: 'clay character, handcrafted toy, cute sculpture, soft texture, transparent background'
-  },
-  {
-    id: 'watercolor',
-    name: 'Watercolor',
-    group: 'art',
-    description: 'Soft brush edges and gentle translucent color.',
-    bestFor: 'Calm emotional stickers',
-    sampleImage: '/samples/styles/watercolor.svg',
-    prompt: 'watercolor illustration, soft brush strokes, pastel colors, cute character sticker, transparent background'
-  },
-  {
-    id: 'glitch',
-    name: 'AI Glitch',
-    group: 'trend',
-    description: 'Digital distortion with cyber-style accents.',
-    bestFor: 'Tech and future mood',
-    sampleImage: '/samples/styles/glitch.svg',
-    prompt: 'glitch art character, digital distortion, cyber aesthetic, sticker design, transparent background'
-  },
-  {
-    id: 'graffiti',
-    name: 'Graffiti',
-    group: 'trend',
-    description: 'Street-art outline, spray texture, and energetic color.',
-    bestFor: 'Bold social posts',
-    sampleImage: '/samples/styles/graffiti.svg',
-    prompt: 'graffiti sticker character, spray paint texture, street art style, bold outlines, transparent background'
+    id: 'idol-fan',
+    name: '팬덤 응원',
+    group: 'fan',
+    description: '응원봉, 반짝임, 축하 문구가 있는 팬덤형.',
+    bestFor: '덕질/응원',
+    sampleImage: '/samples/styles/idol-fan.svg',
+    referenceUrl: 'https://e.kakao.com/search',
+    prompt: 'K-pop fandom cheering sticker, cute character with lightstick, sparkles, supportive Korean caption, transparent background'
   }
 ];

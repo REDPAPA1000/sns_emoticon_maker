@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220">
+  <rect width="220" height="220" fill="#fff9de"/>
+  <path d="M64 94c-24-9-28-45-6-56 21-10 40 8 35 35M156 94c24-9 28-45 6-56-21-10-40 8-35 35" fill="#d99b42" stroke="#2a211c" stroke-width="7"/>
+  <circle cx="110" cy="109" r="60" fill="#f8c767" stroke="#2a211c" stroke-width="7"/>
+  <circle cx="88" cy="105" r="6" fill="#2a211c"/><circle cx="132" cy="105" r="6" fill="#2a211c"/>
+  <ellipse cx="110" cy="124" rx="13" ry="9" fill="#2a211c"/>
+  <path d="M92 146c13 11 23 11 36 0" fill="none" stroke="#2a211c" stroke-width="5" stroke-linecap="round"/>
+  <text x="110" y="199" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="800" fill="#2a211c">가자!</text>
+</svg>

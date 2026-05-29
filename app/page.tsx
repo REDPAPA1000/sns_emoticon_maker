@@ -188,7 +188,7 @@ export default function Home() {
         <h1>SNS 이모티콘 메이커</h1>
         <p>
           사용자의 Gemini API Key와 업로드 이미지를 이용해 SNS용 이모티콘과 스티커를 만듭니다.
-          아래 샘플은 각 스타일이 어떤 방향으로 생성되는지 보여주는 고정 참고 이미지입니다.
+          아래 샘플은 카카오 이모티콘샵과 LINE Creators Market의 실제 인기 스타일을 참고해 다시 구성한 원본 참고 이미지입니다.
         </p>
       </section>
 
@@ -273,7 +273,7 @@ export default function Home() {
           <h3>현재 기능 상태</h3>
           <ul className="small status-list">
             <li>Gemini BYOK 방식: 구현</li>
-            <li>고정 스타일 샘플: 18종 구현</li>
+            <li>시장 참고 스타일 샘플: 12종 구현</li>
             <li>8종 문구 순차 생성: 구현</li>
             <li>ZIP 다운로드: 구현</li>
             <li>플랫폼별 리사이즈: 구현</li>
@@ -307,7 +307,7 @@ export default function Home() {
 
       <section className="section">
         <h2>스타일 샘플 라이브러리</h2>
-        <p className="small">각 샘플은 생성 결과의 방향을 빠르게 비교하기 위한 고정 참고 이미지입니다.</p>
+        <p className="small">실제 이모티콘 마켓의 인기 흐름을 기준으로 고른 12개 스타일입니다. 판매 중인 이미지를 복사하지 않고 방향성만 반영했습니다.</p>
         <StyleGrid selected={selectedStyle.id} onSelect={setSelectedStyle} />
       </section>
 

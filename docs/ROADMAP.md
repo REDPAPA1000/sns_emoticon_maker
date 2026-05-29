@@ -4,8 +4,8 @@
 
 - BYOK Gemini API key input
 - Image upload
-- 18 curated style presets
-- Fixed sample image for each style
+- 12 market-informed style presets
+- Compact sample image for each style
 - Single sticker generation
 - 8 phrase set generation
 - Individual PNG download

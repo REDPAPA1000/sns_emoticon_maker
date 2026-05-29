@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220">
+  <rect width="220" height="220" fill="#fff4e8"/>
+  <circle cx="110" cy="106" r="64" fill="#eec38b" stroke="#2a211c" stroke-width="7"/>
+  <circle cx="76" cy="75" r="21" fill="#eec38b" stroke="#2a211c" stroke-width="7"/>
+  <circle cx="144" cy="75" r="21" fill="#eec38b" stroke="#2a211c" stroke-width="7"/>
+  <circle cx="88" cy="109" r="7" fill="#2a211c"/><circle cx="132" cy="109" r="7" fill="#2a211c"/>
+  <circle cx="82" cy="129" r="12" fill="#ff9f9f" opacity=".9"/><circle cx="138" cy="129" r="12" fill="#ff9f9f" opacity=".9"/>
+  <path d="M96 145c10 8 18 8 28 0" fill="none" stroke="#2a211c" stroke-width="5" stroke-linecap="round"/>
+  <text x="110" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="800" fill="#2a211c">헉!</text>
+</svg>

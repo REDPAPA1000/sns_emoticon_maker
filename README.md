@@ -10,7 +10,7 @@ SNS Emoticon Maker is a BYOK tool for creating SNS stickers from uploaded images
 
 - Gemini BYOK flow
 - Image upload
-- 18 curated style presets with fixed visual samples
+- 12 market-informed style presets with compact visual samples
 - Single sticker generation
 - 8 phrase set generation
 - Individual PNG download

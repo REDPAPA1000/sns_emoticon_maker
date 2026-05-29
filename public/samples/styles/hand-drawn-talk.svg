@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220">
+  <rect width="220" height="220" fill="#fffdf2"/>
+  <path d="M73 113c-6-43 31-67 68-47 33 18 41 64 7 91-31 25-70 6-75-44z" fill="none" stroke="#222" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M88 100l18 7M134 99l-16 8M92 134c19 11 34 7 45-7" fill="none" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+  <path d="M52 154c41-18 89-13 126 15M61 65c-14 5-24 16-28 31" fill="none" stroke="#ff9d00" stroke-width="5" stroke-linecap="round"/>
+  <text x="110" y="200" text-anchor="middle" font-family="Comic Sans MS, Arial, sans-serif" font-size="18" font-weight="800" fill="#222">대충 OK</text>
+</svg>
