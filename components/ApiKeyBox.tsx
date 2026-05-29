@@ -8,38 +8,29 @@ type ApiKeyBoxProps = {
   onChange: (key: string) => void;
 };
 
+type KeyStatus = 'idle' | 'checking' | 'valid' | 'invalid';
+
 export default function ApiKeyBox({ onChange }: ApiKeyBoxProps) {
   const [key, setKey] = useState('');
-  const [checking, setChecking] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'valid' | 'invalid' | 'unknown'>('idle');
+  const [status, setStatus] = useState<KeyStatus>('idle');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
     const saved = localStorage.getItem('gemini_api_key') || '';
     setKey(saved);
     onChange(saved);
+    if (saved.trim().length >= 20) {
+      setStatus('valid');
+      setMessage('저장된 API Key가 있습니다. 실제 생성 단계에서 최종 확인됩니다.');
+    }
   }, [onChange]);
 
-  function save(value: string) {
-    setKey(value);
-    onChange(value);
-    setStatus('idle');
-    setMessage('');
-
-    if (value) {
-      localStorage.setItem('gemini_api_key', value);
-    } else {
-      localStorage.removeItem('gemini_api_key');
-    }
-  }
-
-  async function validateKey() {
+  useEffect(() => {
     const trimmed = key.trim();
-    setMessage('');
 
     if (!trimmed) {
-      setStatus('invalid');
-      setMessage('API Key를 먼저 입력해 주세요.');
+      setStatus('idle');
+      setMessage('');
       return;
     }
 
@@ -49,38 +40,55 @@ export default function ApiKeyBox({ onChange }: ApiKeyBoxProps) {
       return;
     }
 
-    setChecking(true);
+    setStatus('checking');
+    setMessage('API Key를 확인하는 중입니다.');
 
-    try {
-      const response = await fetch('/api/validate-key', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apiKey: trimmed })
-      });
-      const json = await response.json();
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch('/api/validate-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey: trimmed })
+        });
+        const json = await response.json();
 
-      if (!response.ok || json.status === 'invalid') {
-        throw new Error(json.error || 'API Key를 확인해 주세요.');
-      }
+        if (!response.ok || json.status === 'invalid') {
+          setStatus('invalid');
+          setMessage(json.error || 'API Key를 확인해 주세요.');
+          return;
+        }
 
-      if (json.status === 'valid') {
         setStatus('valid');
-        setMessage(json.message || 'API Key가 정상적으로 확인되었습니다.');
-        return;
+        setMessage(json.message || json.warning || 'API Key가 입력되었습니다. 실제 생성 단계에서 최종 확인됩니다.');
+      } catch {
+        setStatus('valid');
+        setMessage('API Key가 입력되었습니다. 네트워크 검사는 건너뛰고 실제 생성 단계에서 최종 확인됩니다.');
       }
+    }, 700);
 
-      setStatus('unknown');
-      setMessage(json.warning || '키 길이는 충분합니다. 실제 이미지 생성으로 최종 확인해 주세요.');
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'API Key 검증 중 오류가 발생했습니다.';
-      setStatus('unknown');
-      setMessage(`${errorMessage} 그래도 키 길이는 충분하다면 실제 생성으로 확인할 수 있습니다.`);
-    } finally {
-      setChecking(false);
+    return () => window.clearTimeout(timer);
+  }, [key]);
+
+  function save(value: string) {
+    setKey(value);
+    onChange(value);
+
+    if (value) {
+      localStorage.setItem('gemini_api_key', value);
+    } else {
+      localStorage.removeItem('gemini_api_key');
     }
   }
 
-  const messageClass = status === 'invalid' ? 'error-text' : status === 'valid' ? 'success-text' : 'warning-text';
+  const statusLabel = status === 'idle'
+    ? 'API Key 미입력'
+    : status === 'checking'
+      ? '검사 중'
+      : status === 'valid'
+        ? '입력됨'
+        : '확인 필요';
+
+  const messageClass = status === 'invalid' ? 'error-text' : status === 'valid' ? 'success-text' : 'small';
 
   return (
     <div className="card">
@@ -89,19 +97,19 @@ export default function ApiKeyBox({ onChange }: ApiKeyBoxProps) {
         무료 배포를 위해 사용자의 개인 키를 브라우저 localStorage에만 저장합니다. 서버 DB에는 저장하지 않습니다.
       </p>
 
-      <input
-        className="input"
-        value={key}
-        onChange={(event) => save(event.target.value)}
-        placeholder="Google AI Studio에서 발급한 API Key 붙여넣기"
-        type="password"
-        autoComplete="off"
-      />
+      <div className="key-input-row">
+        <input
+          className="input key-input"
+          value={key}
+          onChange={(event) => save(event.target.value)}
+          placeholder="Google AI Studio에서 발급한 API Key 붙여넣기"
+          type="password"
+          autoComplete="off"
+        />
+        <span className={`key-status-dot ${status}`} aria-label={statusLabel} title={statusLabel} />
+      </div>
 
       <div className="button-row">
-        <button className="btn secondary" type="button" disabled={checking} onClick={validateKey}>
-          {checking ? '검사 중...' : 'API Key 간단 확인'}
-        </button>
         <a className="btn" href={AI_STUDIO_KEY_URL} target="_blank" rel="noreferrer">
           Gemini API Key 발급
         </a>
