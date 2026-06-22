@@ -1,2 +1,9 @@
-anthropic>=0.40.0
+# 필수
 manim>=0.18.0
+
+# 프로바이더별 선택 설치 (하나만 있어도 동작)
+# Claude (유료, 고품질)
+anthropic>=0.40.0
+# Gemini (무료 티어) — 없으면 REST 폴백 자동 사용
+google-genai>=0.3.0
+# Ollama (로컬 무료) — 추가 패키지 불필요, HTTP로 직접 호출

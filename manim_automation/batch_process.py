@@ -2,7 +2,7 @@
 Manim AI Automation - Batch Processing
 
 Reads topics from a JSON file and generates Manim videos for each topic
-using the Claude-powered pipeline in generate_manim.py.
+using the chosen LLM provider (claude / gemini / ollama).
 """
 
 import argparse
@@ -43,25 +43,14 @@ def print_summary(results: list[dict]) -> None:
 def batch_process(
     topics_file: str,
     output_dir: str,
+    provider: str = "claude",
+    model: str | None = None,
     max_retries: int = 3,
+    quality: str = "l",
     filter_tags: list[str] | None = None,
     filter_ids: list[str] | None = None,
     delay: float = 2.0,
 ) -> list[dict]:
-    """
-    Process all topics from the JSON file.
-
-    Args:
-        topics_file: Path to topics JSON.
-        output_dir: Base directory for video output.
-        max_retries: Retry attempts per topic.
-        filter_tags: If set, only process topics matching at least one tag.
-        filter_ids: If set, only process topics with these IDs.
-        delay: Seconds to wait between topics (rate limiting).
-
-    Returns:
-        List of result dicts from generate_and_render.
-    """
     topics = load_topics(topics_file)
 
     if filter_ids:
@@ -73,7 +62,7 @@ def batch_process(
         print("처리할 주제가 없습니다. 필터를 확인하세요.")
         return []
 
-    print(f"총 {len(topics)}개 주제 처리 시작")
+    print(f"총 {len(topics)}개 주제 처리 시작 (provider: {provider})")
     results = []
 
     for index, entry in enumerate(topics, start=1):
@@ -85,8 +74,11 @@ def batch_process(
 
         result = generate_and_render(
             topic=topic_text,
+            provider=provider,
+            model=model,
             max_retries=max_retries,
             output_dir=topic_output,
+            quality=quality,
         )
         result["id"] = topic_id
         results.append(result)
@@ -108,44 +100,27 @@ def save_results(results: list[dict], output_dir: str) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Batch-generate Manim animations from a topics JSON file.")
+    parser.add_argument("--topics", default=str(DEFAULT_TOPICS_FILE), help="주제 JSON 파일 경로")
+    parser.add_argument("--output", default=str(DEFAULT_OUTPUT_DIR), help="출력 디렉터리")
     parser.add_argument(
-        "--topics",
-        default=str(DEFAULT_TOPICS_FILE),
-        help=f"주제 JSON 파일 경로 (기본값: {DEFAULT_TOPICS_FILE})",
+        "--provider", default=os.environ.get("MANIM_PROVIDER", "claude"),
+        choices=["claude", "gemini", "ollama"], help="LLM 프로바이더 (기본값: claude)",
     )
-    parser.add_argument(
-        "--output",
-        default=str(DEFAULT_OUTPUT_DIR),
-        help=f"출력 디렉터리 (기본값: {DEFAULT_OUTPUT_DIR})",
-    )
-    parser.add_argument(
-        "--retries",
-        type=int,
-        default=3,
-        help="주제당 최대 재시도 횟수 (기본값: 3)",
-    )
-    parser.add_argument(
-        "--tags",
-        nargs="+",
-        help="처리할 태그 필터 (예: --tags calculus geometry)",
-    )
-    parser.add_argument(
-        "--ids",
-        nargs="+",
-        help="처리할 ID 필터 (예: --ids fourier_transform pythagorean_theorem)",
-    )
-    parser.add_argument(
-        "--delay",
-        type=float,
-        default=2.0,
-        help="주제 간 대기 시간(초), API 속도 제한 방지 (기본값: 2.0)",
-    )
+    parser.add_argument("--model", default=None, help="모델 이름 (생략 시 프로바이더별 기본값)")
+    parser.add_argument("--retries", type=int, default=3, help="주제당 최대 재시도 횟수")
+    parser.add_argument("--quality", default="l", choices=["l", "m", "h", "k"], help="렌더링 품질")
+    parser.add_argument("--tags", nargs="+", help="처리할 태그 필터")
+    parser.add_argument("--ids", nargs="+", help="처리할 ID 필터")
+    parser.add_argument("--delay", type=float, default=2.0, help="주제 간 대기 시간(초)")
     args = parser.parse_args()
 
     results = batch_process(
         topics_file=args.topics,
         output_dir=args.output,
+        provider=args.provider,
+        model=args.model,
         max_retries=args.retries,
+        quality=args.quality,
         filter_tags=args.tags,
         filter_ids=args.ids,
         delay=args.delay,
