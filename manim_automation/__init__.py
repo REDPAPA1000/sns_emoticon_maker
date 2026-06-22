@@ -1,0 +1,1 @@
+# Manim AI Automation package

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "fourier_transform",
+    "topic": "푸리에 변환(Fourier Transform)을 회전하는 원들로 시각화하세요. 복잡한 파형이 여러 개의 단순 사인파로 분해되는 과정을 보여주세요.",
+    "tags": ["calculus", "signal-processing", "series"]
+  },
+  {
+    "id": "pythagorean_theorem",
+    "topic": "피타고라스 정리(a² + b² = c²)를 직각삼각형과 각 변 위의 정사각형 넓이로 시각화하세요. 두 정사각형의 넓이 합이 빗변 위 정사각형의 넓이와 같음을 보여주세요.",
+    "tags": ["geometry", "algebra"]
+  },
+  {
+    "id": "derivative_definition",
+    "topic": "미분의 정의를 극한으로 시각화하세요. 함수 f(x) = x²에서 두 점 사이의 할선이 접선으로 수렴하는 과정을 보여주세요.",
+    "tags": ["calculus", "limits"]
+  },
+  {
+    "id": "eulers_identity",
+    "topic": "오일러 항등식 e^(iπ) + 1 = 0을 복소평면에서 시각화하세요. e^(iθ)가 단위원 위를 회전하는 과정과 θ=π일 때 -1에 도달하는 모습을 보여주세요.",
+    "tags": ["complex-numbers", "trigonometry", "calculus"]
+  },
+  {
+    "id": "prime_sieve",
+    "topic": "에라토스테네스의 체(Sieve of Eratosthenes)로 소수를 찾는 과정을 시각화하세요. 1부터 50까지의 수에서 합성수를 순서대로 지워나가는 과정을 보여주세요.",
+    "tags": ["number-theory", "algorithms"]
+  },
+  {
+    "id": "taylor_series",
+    "topic": "sin(x)의 테일러 급수 전개를 시각화하세요. 항이 추가될수록 다항식이 sin(x) 곡선에 수렴하는 과정을 보여주세요.",
+    "tags": ["calculus", "series", "approximation"]
+  },
+  {
+    "id": "binary_search",
+    "topic": "이진 탐색(Binary Search) 알고리즘을 정렬된 배열에서 시각화하세요. 탐색 범위가 절반씩 줄어드는 과정을 강조해 보여주세요.",
+    "tags": ["algorithms", "data-structures"]
+  },
+  {
+    "id": "golden_ratio",
+    "topic": "황금비(Golden Ratio φ ≈ 1.618)를 피보나치 수열과 황금 사각형으로 시각화하세요. 피보나치 수열의 인접항 비율이 φ로 수렴하는 과정을 보여주세요.",
+    "tags": ["number-theory", "geometry", "sequences"]
+  }
+]
