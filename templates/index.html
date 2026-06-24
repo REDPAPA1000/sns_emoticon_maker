@@ -19,7 +19,7 @@
     <section class="video-grid" id="videoGrid">
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">🎬</div>
-        <p>수학 개념을 입력하면<br>Manim 영상을 자동으로 만들어드립니다</p>
+        <p>수학 개념을 입력하면<br>AI가 코드를 생성하고 검토 후 영상을 만들어드립니다</p>
       </div>
     </section>
 
@@ -31,9 +31,9 @@
           placeholder="수학 개념을 입력하세요&#10;예) 이차방정식의 근의 공식, 미분의 기하학적 의미, 피타고라스 정리"
           rows="3"
         ></textarea>
-        <button class="generate-btn" id="generateBtn" onclick="generate()">
-          <span id="btnText">영상 생성</span>
-          <span id="btnIcon">▶</span>
+        <button class="generate-btn" id="generateBtn" onclick="startGenerate()">
+          <span id="btnText">시나리오 생성</span>
+          <span id="btnIcon">✦</span>
         </button>
       </div>
 
@@ -57,6 +57,34 @@
       </div>
     </section>
   </main>
+
+  <!-- ── 코드 검토 모달 ─────────────────────────────── -->
+  <div class="code-modal" id="codeModal">
+    <div class="code-modal-inner">
+      <div class="code-modal-header">
+        <div>
+          <div class="code-modal-title">시나리오 검토 및 수정</div>
+          <div class="code-modal-sub" id="modalTopic"></div>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal()">✕</button>
+      </div>
+
+      <div class="code-modal-body">
+        <div class="code-editor-wrap">
+          <div class="code-editor-label">Manim Python 코드 — 직접 수정 후 제작하세요</div>
+          <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+        </div>
+      </div>
+
+      <div class="code-modal-footer">
+        <button class="modal-cancel-btn" onclick="closeModal()">취소</button>
+        <button class="modal-render-btn" id="renderBtn" onclick="startRender()">
+          <span id="renderBtnText">이 코드로 영상 제작</span>
+          <span>▶</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- 진행 토스트 -->
   <div class="toast" id="toast"></div>
