@@ -1,6 +1,54 @@
-let provider = 'ollama';
-let quality   = 'l';
-let activeJobId = null;   // 현재 검토 모달에 열린 job
+let provider   = 'ollama';
+let quality    = 'l';
+let activeJobId = null;
+let selectedGrade = '중학교';
+
+/* ── 앱 시작 시 설정 로드 ── */
+document.addEventListener('DOMContentLoaded', () => {
+  fetch('/config').then(r => r.json()).then(cfg => {
+    if (cfg.vault_path) document.getElementById('vaultPath').value = cfg.vault_path;
+    if (cfg.grade)      setGradeByValue(cfg.grade);
+  });
+
+  document.getElementById('topicInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); startGenerate(); }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+  document.getElementById('codeModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+});
+
+/* ── 설정 패널 ── */
+function toggleSettings() {
+  document.getElementById('settingsPanel').classList.toggle('open');
+}
+
+function setGrade(btn) {
+  document.querySelectorAll('[data-grade]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedGrade = btn.dataset.grade;
+}
+
+function setGradeByValue(val) {
+  const btn = document.querySelector(`[data-grade="${val}"]`);
+  if (btn) setGrade(btn);
+  else selectedGrade = val;
+}
+
+function saveConfig() {
+  const vault_path = document.getElementById('vaultPath').value.trim();
+  fetch('/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ vault_path, grade: selectedGrade }),
+  }).then(() => {
+    showToast('설정 저장 완료');
+    document.getElementById('settingsPanel').classList.remove('open');
+  });
+}
 
 /* ── 옵션 선택 ── */
 function setProvider(btn) {
@@ -22,7 +70,7 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  setTimeout(() => t.classList.remove('show'), 3500);
 }
 
 /* ── Step 1: 시나리오 생성 ── */
@@ -34,7 +82,7 @@ function startGenerate() {
   btn.disabled = true;
   document.getElementById('btnText').textContent = '생성 중...';
 
-  const card = addCard(topic, 'generating');
+  const card = addCard(topic);
   document.getElementById('emptyState')?.remove();
 
   fetch('/generate', {
@@ -46,6 +94,7 @@ function startGenerate() {
     .then(data => {
       if (data.error) { setCardError(card, data.error); return; }
       document.getElementById('topicInput').value = '';
+      card.id = 'card-' + data.job_id;
       pollForPreview(card, data.job_id, topic);
     })
     .catch(err => setCardError(card, err.message))
@@ -55,28 +104,23 @@ function startGenerate() {
     });
 }
 
-/* 코드가 준비될 때까지 폴링 */
+/* ── 코드 준비 폴링 ── */
 function pollForPreview(card, jobId, topic) {
   updateCardStatus(card, 'generating', 'AI가 코드를 생성하고 있습니다...');
   const iv = setInterval(async () => {
     try {
-      const res  = await fetch('/status/' + jobId);
-      const data = await res.json();
-
+      const data = await fetch('/status/' + jobId).then(r => r.json());
       if (data.status === 'preview') {
         clearInterval(iv);
-        updateCardStatus(card, 'preview', '코드 검토 준비 완료 — 클릭하여 확인');
+        updateCardStatus(card, 'preview', '▶ 클릭하여 코드 검토 후 영상 제작');
         card.style.cursor = 'pointer';
         card.onclick = () => openModal(jobId, topic, data.code);
-        showToast('코드가 준비됐습니다. 카드를 클릭해 검토하세요.');
+        showToast('코드 준비 완료 — 카드를 클릭해 검토하세요');
       } else if (data.status === 'error') {
         clearInterval(iv);
         setCardError(card, data.error || '코드 생성 실패');
       }
-    } catch (e) {
-      clearInterval(iv);
-      setCardError(card, '서버 연결 오류');
-    }
+    } catch { clearInterval(iv); setCardError(card, '서버 연결 오류'); }
   }, 2000);
 }
 
@@ -115,8 +159,6 @@ function startRender() {
     .then(data => {
       if (data.error) { showToast('오류: ' + data.error); renderBtn.disabled = false; return; }
       closeModal();
-
-      // 카드 상태를 렌더링 중으로 변경
       const card = document.getElementById('card-' + jobId);
       if (card) {
         card.style.cursor = 'default';
@@ -125,39 +167,30 @@ function startRender() {
         pollForVideo(card, jobId);
       }
     })
-    .catch(err => {
-      showToast('서버 오류: ' + err.message);
-      renderBtn.disabled = false;
-    });
+    .catch(err => { showToast('서버 오류: ' + err.message); renderBtn.disabled = false; });
 }
 
-/* 영상 완료까지 폴링 */
+/* ── 영상 완료 폴링 ── */
 function pollForVideo(card, jobId) {
   const iv = setInterval(async () => {
     try {
-      const res  = await fetch('/status/' + jobId);
-      const data = await res.json();
+      const data = await fetch('/status/' + jobId).then(r => r.json());
       if (data.status === 'done') {
         clearInterval(iv);
-        setCardDone(card, jobId);
-        showToast('영상 생성 완료!');
+        setCardDone(card, jobId, data);
       } else if (data.status === 'error') {
         clearInterval(iv);
         setCardError(card, data.error || '렌더링 실패');
       }
-    } catch (e) {
-      clearInterval(iv);
-      setCardError(card, '서버 연결 오류');
-    }
+    } catch { clearInterval(iv); setCardError(card, '서버 연결 오류'); }
   }, 2000);
 }
 
-/* ── 카드 UI 헬퍼 ── */
-function addCard(topic, status) {
-  const id   = Math.random().toString(36).slice(2, 8);
+/* ── 카드 UI ── */
+function addCard(topic) {
   const card = document.createElement('div');
   card.className = 'video-card';
-  card.id = 'card-' + id;
+  card.id = 'card-tmp-' + Math.random().toString(36).slice(2, 8);
   card.innerHTML = `
     <div class="card-video-wrap">
       <div class="card-status">
@@ -167,57 +200,40 @@ function addCard(topic, status) {
     </div>
     <div class="card-info">
       <span class="card-topic">${escHtml(topic)}</span>
-      <span class="card-meta">${provider.toUpperCase()} <span class="step-badge ${status}">${statusLabel(status)}</span></span>
+      <span class="card-meta">${provider.toUpperCase()} <span class="step-badge generating">생성중</span></span>
     </div>`;
   document.getElementById('videoGrid').prepend(card);
-  // job_id가 정해지기 전이라 임시 id 사용; pollForPreview 에서 data-job 세팅
   return card;
-}
-
-// 카드 id 기반 재조회를 위해 job_id → card 매핑은 pollForPreview 호출 전에 data-job 속성으로 고정
-function pollForPreview(card, jobId, topic) {
-  card.id = 'card-' + jobId;
-  updateCardStatus(card, 'generating', 'AI가 코드를 생성하고 있습니다...');
-  const iv = setInterval(async () => {
-    try {
-      const res  = await fetch('/status/' + jobId);
-      const data = await res.json();
-      if (data.status === 'preview') {
-        clearInterval(iv);
-        updateCardStatus(card, 'preview', '▶ 클릭하여 코드 검토 후 영상 제작');
-        card.style.cursor = 'pointer';
-        card.onclick = () => openModal(jobId, topic, data.code);
-        showToast('코드 준비 완료 — 카드를 클릭해 검토하세요.');
-      } else if (data.status === 'error') {
-        clearInterval(iv);
-        setCardError(card, data.error || '코드 생성 실패');
-      }
-    } catch (e) {
-      clearInterval(iv);
-      setCardError(card, '서버 연결 오류');
-    }
-  }, 2000);
 }
 
 function updateCardStatus(card, status, msg) {
   const wrap = card.querySelector('.card-video-wrap');
-  const spinnerHtml = (status === 'generating' || status === 'rendering')
-    ? '<div class="spinner"></div>' : '';
-  wrap.innerHTML = `
-    <div class="card-status">
-      ${spinnerHtml}
-      <span class="card-status-text">${escHtml(msg)}</span>
-    </div>`;
+  const spin = (status === 'generating' || status === 'rendering') ? '<div class="spinner"></div>' : '';
+  wrap.innerHTML = `<div class="card-status">${spin}<span class="card-status-text">${escHtml(msg)}</span></div>`;
   const badge = card.querySelector('.step-badge');
   if (badge) { badge.className = `step-badge ${status}`; badge.textContent = statusLabel(status); }
 }
 
-function setCardDone(card, jobId) {
+function setCardDone(card, jobId, data) {
   const wrap = card.querySelector('.card-video-wrap');
   wrap.innerHTML = `<video controls loop src="/video/${jobId}"></video>`;
   const badge = card.querySelector('.step-badge');
   if (badge) { badge.className = 'step-badge done'; badge.textContent = '완료'; }
+
   const info = card.querySelector('.card-info');
+
+  // Vault 저장 완료 배지
+  if (data.vault_saved) {
+    const vb = document.createElement('div');
+    vb.className = 'vault-badge';
+    vb.textContent = '✓ Obsidian에 저장됨';
+    info.parentNode.insertBefore(vb, info.nextSibling);
+    showToast('Obsidian Vault에 자동 저장됐습니다!');
+  } else {
+    showToast('영상 생성 완료!');
+  }
+
+  // 다운로드 버튼
   const dl = document.createElement('a');
   dl.href = `/download/${jobId}`;
   dl.download = '';
@@ -227,11 +243,7 @@ function setCardDone(card, jobId) {
 
 function setCardError(card, msg) {
   const wrap = card.querySelector('.card-video-wrap');
-  wrap.innerHTML = `
-    <div class="card-status">
-      <span class="status-error">⚠ 오류</span>
-      <span style="font-size:11px;padding:0 14px;text-align:center">${escHtml((msg || '').slice(0, 200))}</span>
-    </div>`;
+  wrap.innerHTML = `<div class="card-status"><span class="status-error">⚠ 오류</span><span style="font-size:11px;padding:0 14px;text-align:center">${escHtml((msg||'').slice(0,200))}</span></div>`;
   const badge = card.querySelector('.step-badge');
   if (badge) { badge.className = 'step-badge error'; badge.textContent = '오류'; }
 }
@@ -243,18 +255,3 @@ function statusLabel(s) {
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-/* ── 단축키 ── */
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('topicInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); startGenerate(); }
-  });
-  // Escape 키로 모달 닫기
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeModal();
-  });
-  // 모달 배경 클릭으로 닫기
-  document.getElementById('codeModal').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeModal();
-  });
-});

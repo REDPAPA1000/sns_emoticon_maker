@@ -11,29 +11,55 @@
     <div class="logo">▶ Math Visual</div>
     <div class="header-right">
       <span class="provider-badge" id="providerBadge">Ollama</span>
+      <button class="settings-btn" onclick="toggleSettings()" title="Obsidian Vault 설정">⚙</button>
     </div>
   </header>
 
+  <!-- ── Vault 설정 패널 ── -->
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-inner">
+      <div class="settings-title">Obsidian Vault 설정</div>
+      <div class="settings-row">
+        <label>Vault 폴더 경로</label>
+        <input type="text" id="vaultPath"
+          placeholder="예) C:\Users\이름\Documents\수학교재  또는  /Users/이름/수학교재" />
+      </div>
+      <div class="settings-row">
+        <label>학년 (폴더명)</label>
+        <div class="btn-group">
+          <button class="opt-btn" data-grade="중학교1학년" onclick="setGrade(this)">중1</button>
+          <button class="opt-btn" data-grade="중학교2학년" onclick="setGrade(this)">중2</button>
+          <button class="opt-btn" data-grade="중학교3학년" onclick="setGrade(this)">중3</button>
+          <button class="opt-btn" data-grade="고등학교1학년" onclick="setGrade(this)">고1</button>
+          <button class="opt-btn" data-grade="고등학교2학년" onclick="setGrade(this)">고2</button>
+          <button class="opt-btn" data-grade="고등학교3학년" onclick="setGrade(this)">고3</button>
+        </div>
+      </div>
+      <div class="settings-footer">
+        <span class="settings-desc">설정하면 영상 완성 후 Vault에 자동 저장됩니다</span>
+        <button class="save-config-btn" onclick="saveConfig()">저장</button>
+      </div>
+    </div>
+  </div>
+
   <main>
-    <!-- 생성된 영상 목록 -->
+    <!-- 영상 목록 -->
     <section class="video-grid" id="videoGrid">
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">🎬</div>
-        <p>수학 개념을 입력하면<br>AI가 코드를 생성하고 검토 후 영상을 만들어드립니다</p>
+        <p>수학 개념을 입력하면<br>AI가 코드를 생성하고 검토 후 Obsidian에 저장됩니다</p>
       </div>
     </section>
 
     <!-- 입력 패널 -->
     <section class="input-panel">
       <div class="input-box">
-        <textarea
-          id="topicInput"
+        <textarea id="topicInput"
           placeholder="수학 개념을 입력하세요&#10;예) 이차방정식의 근의 공식, 미분의 기하학적 의미, 피타고라스 정리"
-          rows="3"
-        ></textarea>
+          rows="3"></textarea>
         <button class="generate-btn" id="generateBtn" onclick="startGenerate()">
           <span id="btnText">시나리오 생성</span>
-          <span id="btnIcon">✦</span>
+          <span>✦</span>
         </button>
       </div>
 
@@ -49,16 +75,16 @@
         <div class="option-group">
           <label>화질</label>
           <div class="btn-group">
-            <button class="opt-btn active" data-quality="l" onclick="setQuality(this)">빠름 480p</button>
+            <button class="opt-btn active" data-quality="l" onclick="setQuality(this)">480p</button>
             <button class="opt-btn" data-quality="m" onclick="setQuality(this)">720p</button>
-            <button class="opt-btn" data-quality="h" onclick="setQuality(this)">고화질 1080p</button>
+            <button class="opt-btn" data-quality="h" onclick="setQuality(this)">1080p</button>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- ── 코드 검토 모달 ─────────────────────────────── -->
+  <!-- ── 코드 검토 모달 ── -->
   <div class="code-modal" id="codeModal">
     <div class="code-modal-inner">
       <div class="code-modal-header">
@@ -68,14 +94,12 @@
         </div>
         <button class="modal-close-btn" onclick="closeModal()">✕</button>
       </div>
-
       <div class="code-modal-body">
         <div class="code-editor-wrap">
-          <div class="code-editor-label">Manim Python 코드 — 직접 수정 후 제작하세요</div>
+          <div class="code-editor-label">Manim Python 코드 — 수정 후 제작하세요</div>
           <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
         </div>
       </div>
-
       <div class="code-modal-footer">
         <button class="modal-cancel-btn" onclick="closeModal()">취소</button>
         <button class="modal-render-btn" id="renderBtn" onclick="startRender()">
@@ -86,9 +110,7 @@
     </div>
   </div>
 
-  <!-- 진행 토스트 -->
   <div class="toast" id="toast"></div>
-
   <script src="/static/main.js"></script>
 </body>
 </html>
