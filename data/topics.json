@@ -2,41 +2,97 @@
   {
     "id": "fourier_transform",
     "topic": "푸리에 변환(Fourier Transform)을 회전하는 원들로 시각화하세요. 복잡한 파형이 여러 개의 단순 사인파로 분해되는 과정을 보여주세요.",
-    "tags": ["calculus", "signal-processing", "series"]
+    "tags": ["고등학교", "calculus", "signal-processing"]
   },
   {
     "id": "pythagorean_theorem",
     "topic": "피타고라스 정리(a² + b² = c²)를 직각삼각형과 각 변 위의 정사각형 넓이로 시각화하세요. 두 정사각형의 넓이 합이 빗변 위 정사각형의 넓이와 같음을 보여주세요.",
-    "tags": ["geometry", "algebra"]
+    "tags": ["중학교2학년", "도형의닮음", "geometry"]
   },
   {
     "id": "derivative_definition",
     "topic": "미분의 정의를 극한으로 시각화하세요. 함수 f(x) = x²에서 두 점 사이의 할선이 접선으로 수렴하는 과정을 보여주세요.",
-    "tags": ["calculus", "limits"]
+    "tags": ["고등학교", "calculus"]
   },
   {
     "id": "eulers_identity",
-    "topic": "오일러 항등식 e^(iπ) + 1 = 0을 복소평면에서 시각화하세요. e^(iθ)가 단위원 위를 회전하는 과정과 θ=π일 때 -1에 도달하는 모습을 보여주세요.",
-    "tags": ["complex-numbers", "trigonometry", "calculus"]
+    "topic": "오일러 항등식 e^(iπ) + 1 = 0을 복소평면에서 시각화하세요.",
+    "tags": ["고등학교", "complex-numbers"]
   },
   {
     "id": "prime_sieve",
-    "topic": "에라토스테네스의 체(Sieve of Eratosthenes)로 소수를 찾는 과정을 시각화하세요. 1부터 50까지의 수에서 합성수를 순서대로 지워나가는 과정을 보여주세요.",
-    "tags": ["number-theory", "algorithms"]
+    "topic": "에라토스테네스의 체로 소수를 찾는 과정을 시각화하세요. 1부터 50까지의 수에서 합성수를 순서대로 지워나가는 과정을 보여주세요.",
+    "tags": ["중학교", "number-theory"]
   },
   {
     "id": "taylor_series",
     "topic": "sin(x)의 테일러 급수 전개를 시각화하세요. 항이 추가될수록 다항식이 sin(x) 곡선에 수렴하는 과정을 보여주세요.",
-    "tags": ["calculus", "series", "approximation"]
+    "tags": ["고등학교", "calculus"]
   },
   {
     "id": "binary_search",
-    "topic": "이진 탐색(Binary Search) 알고리즘을 정렬된 배열에서 시각화하세요. 탐색 범위가 절반씩 줄어드는 과정을 강조해 보여주세요.",
-    "tags": ["algorithms", "data-structures"]
+    "topic": "이진 탐색 알고리즘을 정렬된 배열에서 시각화하세요. 탐색 범위가 절반씩 줄어드는 과정을 강조해 보여주세요.",
+    "tags": ["중학교", "algorithms"]
   },
   {
     "id": "golden_ratio",
-    "topic": "황금비(Golden Ratio φ ≈ 1.618)를 피보나치 수열과 황금 사각형으로 시각화하세요. 피보나치 수열의 인접항 비율이 φ로 수렴하는 과정을 보여주세요.",
-    "tags": ["number-theory", "geometry", "sequences"]
+    "topic": "황금비(φ ≈ 1.618)를 피보나치 수열과 황금 사각형으로 시각화하세요.",
+    "tags": ["중학교", "geometry"]
+  },
+
+  {
+    "id": "similarity_meaning",
+    "topic": "도형의 닮음의 뜻을 시각화하세요. 두 도형이 닮음인 경우 대응하는 변의 길이의 비(닮음비)가 일정하고 대응하는 각의 크기가 같음을 삼각형과 사각형 예시로 보여주세요.",
+    "tags": ["중학교2학년", "도형의닮음"]
+  },
+  {
+    "id": "similarity_ratio",
+    "topic": "닮음비를 시각화하세요. 두 닮은 삼각형에서 닮음비가 m:n일 때 대응변의 길이 비교, 넓이의 비 m²:n², 부피의 비 m³:n³ 관계를 단계적으로 보여주세요.",
+    "tags": ["중학교2학년", "도형의닮음"]
+  },
+  {
+    "id": "triangle_similarity_sss",
+    "topic": "삼각형의 닮음 조건 SSS(세 변의 비가 같을 때)를 시각화하세요. 두 삼각형의 세 쌍의 대응변의 비가 모두 같으면 닮음임을 구체적인 수치와 함께 보여주세요.",
+    "tags": ["중학교2학년", "도형의닮음"]
+  },
+  {
+    "id": "triangle_similarity_sas",
+    "topic": "삼각형의 닮음 조건 SAS(두 변의 비와 끼인각이 같을 때)를 시각화하세요. 두 쌍의 대응변의 비가 같고 그 끼인각이 같으면 닮음임을 애니메이션으로 보여주세요.",
+    "tags": ["중학교2학년", "도형의닮음"]
+  },
+  {
+    "id": "triangle_similarity_aa",
+    "topic": "삼각형의 닮음 조건 AA(두 각의 크기가 같을 때)를 시각화하세요. 두 쌍의 대응각이 같으면 세 번째 각도 자동으로 같아져 닮음이 됨을 보여주세요.",
+    "tags": ["중학교2학년", "도형의닮음"]
+  },
+  {
+    "id": "parallel_line_similarity",
+    "topic": "삼각형에서 평행선과 닮음 관계를 시각화하세요. 삼각형 ABC에서 BC와 평행한 선이 AB, AC를 점 D, E에서 만날 때 AD:DB = AE:EC 비례 관계를 보여주세요.",
+    "tags": ["중학교2학년", "도형의닮음"]
+  },
+  {
+    "id": "midpoint_theorem",
+    "topic": "삼각형의 중점연결정리를 시각화하세요. 삼각형 두 변의 중점을 연결한 선분은 나머지 한 변에 평행하고 그 길이의 절반임을 애니메이션으로 증명해 보여주세요.",
+    "tags": ["중학교2학년", "도형의닮음"]
+  },
+  {
+    "id": "similarity_area_ratio",
+    "topic": "닮은 도형의 넓이 비를 시각화하세요. 닮음비가 m:n인 두 도형의 넓이의 비는 m²:n²임을 정사각형과 삼각형으로 구체적인 수치와 함께 보여주세요.",
+    "tags": ["중학교2학년", "도형의닮음"]
+  },
+  {
+    "id": "similarity_application_height",
+    "topic": "닮음을 활용한 높이 측정법을 시각화하세요. 막대기의 그림자와 건물의 그림자 비를 이용해 건물의 높이를 구하는 과정을 닮은 삼각형으로 보여주세요.",
+    "tags": ["중학교2학년", "도형의닮음"]
+  },
+  {
+    "id": "similarity_application_map",
+    "topic": "축척과 닮음을 시각화하세요. 지도의 축척이 1:50000일 때 지도상의 거리와 실제 거리의 관계를 닮음비로 설명하고 구체적인 예시를 보여주세요.",
+    "tags": ["중학교2학년", "도형의닮음"]
+  },
+  {
+    "id": "right_triangle_similarity",
+    "topic": "직각삼각형의 닮음을 시각화하세요. 직각삼각형에서 꼭짓점에서 빗변에 내린 수선이 만드는 세 삼각형이 모두 닮음임을 AA 조건으로 보여주세요.",
+    "tags": ["중학교2학년", "도형의닮음"]
   }
 ]
