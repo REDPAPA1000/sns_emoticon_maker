@@ -21,7 +21,7 @@ import time
 
 import providers
 
-SYSTEM_PROMPT = textwrap.dedent("""
+SYSTEM_PROMPT_BASE = textwrap.dedent("""
 당신은 Manim Community Edition(ManimCE) 수학 애니메이션 전문가입니다.
 Python과 Manim 라이브러리를 사용해 수학 개념을 시각적으로 설명하는 코드를 작성합니다.
 
@@ -45,13 +45,38 @@ Python과 Manim 라이브러리를 사용해 수학 개념을 시각적으로 �
 - 도형 크기는 프레임 경계(-7.1 ~ 7.1, -4.0 ~ 4.0)를 넘지 않게 합니다.
 
 기타:
-- 수식은 LaTeX 형식의 MathTex 를 사용합니다.
 - 색상은 Manim 내장 상수(BLUE, RED, GREEN, YELLOW, WHITE, GRAY_B 등)를 사용합니다.
-- 영상 길이는 30~90초 분량으로 구성합니다.
 - 코드는 ManimCE 최신 버전 기준으로 작성합니다.
 - 응답은 반드시 파이썬 코드 블록(```python ... ```) 형식으로만 반환합니다.
 - 코드 외의 설명은 코드 블록 밖에 최소한으로만 작성합니다.
-""".strip())
+""").strip()
+
+SYSTEM_PROMPT_BASIC = SYSTEM_PROMPT_BASE + "\n\n" + textwrap.dedent("""
+─── 기본(Basic) 레벨 영상 제작 원칙 ───────────────────────────────────
+대상: 중학생, 수학을 어려워하는 학생
+목표: 영상만 봐도 혼자 이해할 수 있을 만큼 쉽게
+
+- 일상 생활 예시로 시작하세요 (사진 복사, 지도, 그림자 등).
+- 개념을 한 번에 하나씩 천천히 단계별로 보여주세요.
+- 핵심 1~2가지만 전달하고 나머지는 생략하세요.
+- 복잡한 수식보다 색깔·크기·움직임으로 설명하세요.
+- 핵심 문장은 화면에 짧게 텍스트로 표시하세요 (예: "두 각이 같으면 닮음!").
+- 영상 길이: 40~60초.
+""").strip()
+
+SYSTEM_PROMPT_ADVANCED = SYSTEM_PROMPT_BASE + "\n\n" + textwrap.dedent("""
+─── 심화(Advanced) 레벨 영상 제작 원칙 ────────────────────────────────
+대상: 개념을 이미 아는 학생, 시험 대비
+목표: 수학적 엄밀성 + 증명 과정 이해
+
+- 정의 → 조건 → 증명 → 예제 순서로 구성하세요.
+- MathTex로 수식을 정확하게 표현하세요.
+- 증명 과정을 단계별로 논리적으로 보여주세요.
+- 여러 예제와 반례를 포함하세요.
+- 영상 길이: 60~90초.
+""").strip()
+
+SYSTEM_PROMPT = SYSTEM_PROMPT_BASIC  # 기본값
 
 
 def extract_code(text: str) -> str:
@@ -70,8 +95,10 @@ def generate_manim_code(
     provider: str = "claude",
     model: str | None = None,
     error_log: str | None = None,
+    level: str = "기본",
 ) -> str:
     """Ask the chosen LLM to generate (or fix) Manim code for the topic."""
+    system = SYSTEM_PROMPT_BASIC if level == "기본" else SYSTEM_PROMPT_ADVANCED
     user_message = (
         f"다음 수학 주제를 설명하는 Manim 애니메이션 코드를 작성해주세요:\n\n{topic}"
     )
@@ -81,7 +108,7 @@ def generate_manim_code(
             f"원인을 분석하고 수정된 전체 코드를 작성해주세요:\n\n{error_log}"
         )
 
-    raw_text = providers.generate(provider, SYSTEM_PROMPT, user_message, model)
+    raw_text = providers.generate(provider, system, user_message, model)
     return extract_code(raw_text)
 
 
@@ -146,6 +173,7 @@ def generate_and_render(
     max_retries: int = 3,
     output_dir: str = "output",
     quality: str = "l",
+    level: str = "기본",
 ) -> dict:
     """
     Full pipeline: topic → LLM code → syntax check → manim render → retry on error.
@@ -160,7 +188,7 @@ def generate_and_render(
     for attempt in range(1, max_retries + 1):
         print(f"  Attempt {attempt}/{max_retries}: generating code...", end=" ", flush=True)
         try:
-            code = generate_manim_code(topic, provider, model, error_log)
+            code = generate_manim_code(topic, provider, model, error_log, level)
         except providers.ProviderError as exc:
             print(f"\n    Provider error: {exc}")
             return _result(topic, provider, False, attempt, None, output_dir, str(exc))

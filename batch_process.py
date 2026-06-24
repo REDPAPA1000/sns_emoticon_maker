@@ -49,6 +49,7 @@ def batch_process(
     quality: str = "l",
     filter_tags: list[str] | None = None,
     filter_ids: list[str] | None = None,
+    filter_level: str | None = None,
     delay: float = 2.0,
 ) -> list[dict]:
     topics = load_topics(topics_file)
@@ -57,6 +58,8 @@ def batch_process(
         topics = [t for t in topics if t.get("id") in filter_ids]
     if filter_tags:
         topics = [t for t in topics if any(tag in t.get("tags", []) for tag in filter_tags)]
+    if filter_level:
+        topics = [t for t in topics if t.get("level") == filter_level]
 
     if not topics:
         print("처리할 주제가 없습니다. 필터를 확인하세요.")
@@ -72,6 +75,7 @@ def batch_process(
 
         print(f"\n[{index}/{len(topics)}] ID: {topic_id}")
 
+        level = entry.get("level", "기본")
         result = generate_and_render(
             topic=topic_text,
             provider=provider,
@@ -79,6 +83,7 @@ def batch_process(
             max_retries=max_retries,
             output_dir=topic_output,
             quality=quality,
+            level=level,
         )
         result["id"] = topic_id
         results.append(result)
@@ -112,6 +117,7 @@ if __name__ == "__main__":
     parser.add_argument("--tags", nargs="+", help="처리할 태그 필터")
     parser.add_argument("--ids", nargs="+", help="처리할 ID 필터")
     parser.add_argument("--delay", type=float, default=2.0, help="주제 간 대기 시간(초)")
+    parser.add_argument("--level", choices=["기본", "심화"], help="레벨 필터 (기본/심화)")
     args = parser.parse_args()
 
     results = batch_process(
@@ -123,6 +129,7 @@ if __name__ == "__main__":
         quality=args.quality,
         filter_tags=args.tags,
         filter_ids=args.ids,
+        filter_level=args.level,
         delay=args.delay,
     )
 
