@@ -1,0 +1,5 @@
+# Manim build artifacts
+Tex/
+texts/
+__pycache__/
+videos/*/*/partial_movie_files/
