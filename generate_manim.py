@@ -36,6 +36,15 @@ Python과 Manim 라이브러리를 사용해 수학 개념을 시각적으로 �
 - 제목·강조: Text("내용", font="NanumSquareRound ExtraBold", font_size=44)
 - 본문·레이블: Text("내용", font="NanumSquareRound", font_size=22)
 - MathTex·Tex는 폰트 지정 없이 그대로 사용합니다.
+- ⚠️ 절대 금지: MathTex/Tex 안에 한국어를 넣지 마세요.
+  (예: MathTex(r"\\frac{높이}{밑변}") → LaTeX 컴파일 오류 발생!)
+  한국어가 필요하면 Text 로 만들고, 수식은 a, b, c 같은 기호로 표현하세요.
+
+교육 영상 구성 (원리 → 공식 순서):
+- 개념의 "원리"를 먼저 시각적으로 유도해 보여주세요.
+- 마지막에 "공식 정리"를 표나 강조 박스로 깔끔하게 정리하세요.
+- 섹션이 바뀔 때는 FadeOut 으로 화면을 비우고 다음 섹션을 그리세요.
+- 각 섹션 상단에 ①②③ 번호와 소제목(Text)을 붙이세요.
 
 16:9 레이아웃 (Manim 기본 프레임: 가로 14.22 × 세로 8.0):
 - 제목 전용 구역: y > 2.0 (title.to_edge(UP, buff=0.35) 후 sep line 추가)
