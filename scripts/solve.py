@@ -178,47 +178,81 @@ def build_note_image(sections, prob_img_path=None, title="풀이 노트"):
     fkb = fnt(GTB,   20)
     fkl = fnt(GTB,   26)
 
-    # ── 썸네일 준비 ──────────────────────────────────────
-    TITLE_ZONE_H  = 204
-    THUMB_H       = TITLE_ZONE_H - 20
-    RIGHT_ZONE_ST = 652
-    THUMB_MAX_W   = A4_W - PAD_R - RIGHT_ZONE_ST
-    TITLE_TOP     = HDR_H + 14
-    CONTENT_TOP   = HDR_H + TITLE_ZONE_H + 18
+    CONTENT_TOP = HDR_H + 18
 
-    thumb = None
+    # ── 문제 이미지 준비 (우측 컬럼, 전체 이미지) ─────────
+    RIGHT_COL_W = 370
+    COL_GAP     = 20
+    RIGHT_COL_X = A4_W - PAD_R - RIGHT_COL_W   # 818
+
+    prob_img   = None
+    prob_img_h = 0
     if prob_img_path and os.path.exists(prob_img_path):
-        pi = Image.open(prob_img_path).convert("RGB")
-        cropped = pi.crop((0, 0, pi.width, int(pi.height * 0.48)))
-        scale = min(THUMB_MAX_W / cropped.width, THUMB_H / cropped.height)
-        tw, th = int(cropped.width * scale), int(cropped.height * scale)
-        thumb = (cropped.resize((tw, th), Image.LANCZOS), tw, th)
+        pi    = Image.open(prob_img_path).convert("RGB")
+        scale = RIGHT_COL_W / pi.width
+        pw, ph = RIGHT_COL_W, int(pi.height * scale)
+        prob_img   = pi.resize((pw, ph), Image.LANCZOS)
+        prob_img_h = ph
 
-    # ── 전체 높이 계산 ───────────────────────────────────
-    def row_px(sec):
-        h = 0
-        if sec["emoji"] in ("📌", "✏️", "💡"):
-            h += LINE_H  # 섹션 헤더
-        elif sec["emoji"] == "✅":
-            h += int(LINE_H * 1.6)
+    TEXT_W = (RIGHT_COL_X - COL_GAP - PAD_L) if prob_img else (A4_W - PAD_L - PAD_R)
 
+    # ── 텍스트 래핑 (측정용 임시 draw 사용) ──────────────
+    _tmp = Image.new("RGB", (A4_W, 10))
+    _mdr = ImageDraw.Draw(_tmp)
+
+    def wrap(text, font, max_w):
+        out, cur = [], ""
+        for ch in text:
+            t = cur + ch
+            if _mdr.textlength(t, font=font) <= max_w:
+                cur = t
+            else:
+                if cur:
+                    out.append(cur)
+                cur = ch
+        if cur:
+            out.append(cur)
+        return out or [""]
+
+    # ── 섹션별 렌더 데이터 사전 구성 (wrap 포함) ──────────
+    render_sections = []
+    for sec in sections:
+        emoji  = sec["emoji"]
+        r_lines = []
         for ln in sec["lines"]:
             step_m = re.match(r"^(\d+)단계[.·\s](.*)", ln)
-            if sec["emoji"] == "✏️" and step_m:
-                h += LINE_H
+            if emoji == "✏️" and step_m:
+                wrapped = wrap(step_m.group(2), fs, TEXT_W - 46)
+                r_lines.append(("step", int(step_m.group(1)), wrapped))
+            elif emoji == "✅":
+                wrapped = wrap(ln, fa, TEXT_W - 32)
+                r_lines.append(("answer", wrapped))
             else:
-                h += LINE_H
-        h += GAP_H  # 섹션 뒤 간격
-        return h
+                indent_extra = 46 if emoji == "✏️" else 20
+                wrapped = wrap(ln, fb, TEXT_W - indent_extra)
+                r_lines.append(("body", wrapped))
+        render_sections.append({"emoji": emoji, "title": sec["title"], "r_lines": r_lines})
 
-    content_h = sum(row_px(s) for s in sections) + 20
-    total_h = max(A4_H, CONTENT_TOP + content_h + FTR_H + 20)
+    # ── 전체 높이 계산 ────────────────────────────────────
+    def section_height(rsec):
+        h = LINE_H  # 헤더 필 1줄
+        for item in rsec["r_lines"]:
+            wrapped = item[2] if item[0] == "step" else item[1]
+            h += LINE_H * len(wrapped)
+        return h + GAP_H
 
-    # ── 캔버스 ──────────────────────────────────────────
-    img = Image.new("RGB", (A4_W, total_h), BG)
+    content_h = sum(section_height(s) for s in render_sections) + 20
+    total_h = max(
+        A4_H,
+        CONTENT_TOP + content_h + FTR_H + 20,
+        CONTENT_TOP + prob_img_h + 30 + FTR_H,
+    )
+
+    # ── 캔버스 ───────────────────────────────────────────
+    img  = Image.new("RGB", (A4_W, total_h), BG)
     draw = ImageDraw.Draw(img)
 
-    # 배경 질감
+    # 배경 질감 (줄선 없음 — 빈 종이)
     px = img.load()
     for y in range(HDR_H, total_h):
         for x in range(A4_W):
@@ -226,41 +260,23 @@ def build_note_image(sections, prob_img_path=None, title="풀이 노트"):
             r, g, b = px[x, y]
             px[x, y] = (max(0,min(255,r+n)), max(0,min(255,g+n)), max(0,min(255,b+n)))
 
-    # 줄선
-    y0 = CONTENT_TOP + LINE_H
-    while y0 < total_h - FTR_H - 8:
-        draw.line([(0, y0), (A4_W, y0)], fill=LINE_C, width=1)
-        y0 += LINE_H
-
-    # ── 헤더 바 ─────────────────────────────────────────
+    # ── 헤더 바 ──────────────────────────────────────────
     draw.rectangle([(0,0),(A4_W,HDR_H)], fill=HDR_BG)
     draw.rectangle([(0,0),(7,HDR_H)], fill=HDR_AC)
     draw.text((22,15), "AI 풀이 노트", font=fkl, fill=(255,255,255))
     draw.text((22,46), "REDPAPA  ·  손글씨 풀이 노트", font=fk, fill=(160,175,220))
     draw.line([(0,HDR_H),(A4_W,HDR_H)], fill=(60,80,140), width=2)
 
-    # ── 썸네일 ──────────────────────────────────────────
-    if thumb:
-        t_img, tw, th = thumb
-        tx = RIGHT_ZONE_ST + (THUMB_MAX_W - tw) // 2
-        ty = TITLE_TOP + (THUMB_H - th) // 2
-        draw.rounded_rectangle([(tx-6,ty-6),(tx+tw+6,ty+th+6)],
-                                radius=6, fill=(228,228,222), outline=(180,185,200), width=1)
-        img.paste(t_img, (tx, ty))
-        draw.rounded_rectangle([(tx,ty),(tx+58,ty+24)], radius=4, fill=(50,60,100))
-        draw.text((tx+6,ty+4), "문 제", font=fk, fill=(255,255,255))
-
-    # ── 타이틀 구역 ─────────────────────────────────────
-    lx = PAD_L
-    draw.rounded_rectangle([(lx,TITLE_TOP),(lx+130,TITLE_TOP+28)],
-                            radius=6, fill=(240,244,255), outline=(180,195,240), width=1)
-    draw.text((lx+10,TITLE_TOP+5), "AI 풀이 노트", font=fk, fill=(60,80,180))
-    draw.text((lx,TITLE_TOP+38), title, font=fnt(GTB,34), fill=(25,35,80))
-    for i, col in enumerate([(99,132,255),(239,68,68),(34,197,94)]):
-        draw.rectangle([(lx,TITLE_TOP+118+i*14),(lx+50+i*30,TITLE_TOP+124+i*14)], fill=col)
-
-    sep_y = HDR_H + TITLE_ZONE_H + 6
-    draw.line([(PAD_L,sep_y),(A4_W-PAD_R,sep_y)], fill=(175,190,215), width=2)
+    # ── 문제 이미지 (우측 컬럼, 전체 이미지 표시) ─────────
+    if prob_img:
+        ix, iy = RIGHT_COL_X, CONTENT_TOP + 10
+        draw.rounded_rectangle(
+            [(ix-8, iy-8), (ix + RIGHT_COL_W + 8, iy + prob_img_h + 8)],
+            radius=8, fill=(228,228,222), outline=(180,185,200), width=1,
+        )
+        img.paste(prob_img, (ix, iy))
+        draw.rounded_rectangle([(ix, iy), (ix+52, iy+22)], radius=4, fill=(50,60,100))
+        draw.text((ix+6, iy+3), "문 제", font=fk, fill=(255,255,255))
 
     # ── 본문 렌더링 ──────────────────────────────────────
     def pill(x1,y1,x2,y2,fill,brd):
@@ -273,49 +289,59 @@ def build_note_image(sections, prob_img_path=None, title="풀이 노트"):
     def jit(a=1):
         return rng.randint(-a,a), rng.randint(-a,a)
 
+    TEXT_RIGHT = PAD_L + TEXT_W
     cy = CONTENT_TOP + 4
 
-    for sec in sections:
-        emoji = sec["emoji"]
-        col = SEC.get(emoji, SEC["📌"])
+    for rsec in render_sections:
+        emoji = rsec["emoji"]
+        col   = SEC.get(emoji, SEC["📌"])
         dx, dy = jit()
 
         if emoji == "✅":
-            # 정답 박스: 풀 너비
-            box_h = int(LINE_H * 1.5)
-            pill(PAD_L, cy, A4_W-PAD_R, cy+box_h, col["box"], col["brd"])
-            draw.text((PAD_L+16+dx, cy+4+dy), sec["title"], font=ft, fill=col["txt"])
+            # 정답 박스: 내용 전체를 감싸는 컬러 박스
+            ans_lines = []
+            for item in rsec["r_lines"]:
+                ans_lines.extend(item[1])
+            box_h = LINE_H + LINE_H * len(ans_lines) + 16
+            pill(PAD_L, cy, TEXT_RIGHT, cy + box_h, col["box"], col["brd"])
+            draw.text((PAD_L+16+dx, cy+8+dy), rsec["title"], font=ft, fill=col["txt"])
             cy += LINE_H
-            for ln in sec["lines"]:
-                draw.text((PAD_L+32+dx, cy+dy), ln, font=fa, fill=col["ink"])
+            for wln in ans_lines:
+                ddx, ddy = jit()
+                draw.text((PAD_L+32+ddx, cy+ddy), wln, font=fa, fill=col["ink"])
                 cy += LINE_H
-            cy += GAP_H
+            cy += GAP_H + 8
             continue
 
         # 섹션 헤더 필
-        pill(PAD_L, cy+2, PAD_L+260, cy+LINE_H-8, col["box"], col["brd"])
-        draw.text((PAD_L+14+dx, cy+4+dy), sec["title"], font=ft, fill=col["txt"])
+        pill(PAD_L, cy+2, PAD_L+280, cy+LINE_H-8, col["box"], col["brd"])
+        draw.text((PAD_L+14+dx, cy+4+dy), rsec["title"], font=ft, fill=col["txt"])
         cy += LINE_H
 
-        step_num = 0
-        for ln in sec["lines"]:
-            dx, dy = jit()
-            step_m = re.match(r"^(\d+)단계[.·\s](.*)", ln)
-            if emoji == "✏️" and step_m:
-                step_num += 1
-                n = int(step_m.group(1)) - 1
-                bcol = STEP_COLORS[n % len(STEP_COLORS)]
-                badge_circle(PAD_L+18, cy+LINE_H//2-1, 15, bcol, int(step_m.group(1)))
-                draw.text((PAD_L+40+dx, cy+dy), step_m.group(2), font=fs, fill=bcol)
+        for item in rsec["r_lines"]:
+            kind = item[0]
+            if kind == "step":
+                step_num = item[1]
+                wrapped  = item[2]
+                bcol = STEP_COLORS[(step_num - 1) % len(STEP_COLORS)]
+                ddx, ddy = jit()
+                badge_circle(PAD_L+18, cy+LINE_H//2-1, 15, bcol, step_num)
+                draw.text((PAD_L+40+ddx, cy+ddy), wrapped[0], font=fs, fill=bcol)
                 cy += LINE_H
-            else:
+                for wln in wrapped[1:]:
+                    ddx, ddy = jit()
+                    draw.text((PAD_L+46+ddx, cy+ddy), wln, font=fs, fill=bcol)
+                    cy += LINE_H
+            else:  # body
                 indent = PAD_L + (46 if emoji == "✏️" else 20)
-                draw.text((indent+dx, cy+dy), ln, font=fb, fill=col["ink"])
-                cy += LINE_H
+                for wln in item[1]:
+                    ddx, ddy = jit()
+                    draw.text((indent+ddx, cy+ddy), wln, font=fb, fill=col["ink"])
+                    cy += LINE_H
 
         cy += GAP_H
 
-    # ── 푸터 ────────────────────────────────────────────
+    # ── 푸터 ─────────────────────────────────────────────
     fy = total_h - FTR_H
     draw.line([(PAD_L,fy),(A4_W-PAD_R,fy)], fill=(200,210,225), width=1)
     draw.text((PAD_L,fy+10), "AI 풀이 노트  ·  REDPAPA", font=fk, fill=(160,170,145))
