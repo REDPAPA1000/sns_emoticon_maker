@@ -122,7 +122,6 @@ function NoteSection({ sec }: { sec: Section }) {
 }
 
 export default function SolverPage() {
-  const [apiKey, setApiKey] = useState('');
   const [image, setImage] = useState('');
   const [solution, setSolution] = useState('');
   const [loading, setLoading] = useState(false);
@@ -165,7 +164,7 @@ export default function SolverPage() {
       const res = await fetch('/api/solve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apiKey, imageDataUrl: image })
+        body: JSON.stringify({ imageDataUrl: image })
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || '풀이 실패');
@@ -180,7 +179,7 @@ export default function SolverPage() {
   const handlePrint = () => window.print();
 
   const sections = solution ? parseSolution(solution) : [];
-  const canSolve = Boolean(apiKey && image && !loading);
+  const canSolve = Boolean(image && !loading);
 
   return (
     <main className="app-shell">
@@ -204,32 +203,18 @@ export default function SolverPage() {
         <div className="solver-layout">
           {/* 왼쪽: 입력 패널 */}
           <div className="solver-left no-print">
-            <section className="panel">
-              <div className="panel-header">
-                <div>
-                  <span className="step-label">STEP 1</span>
-                  <h2>Gemini API Key</h2>
-                </div>
+            <div className="claude-badge">
+              <span className="claude-dot" />
+              <div>
+                <span className="claude-badge-title">Claude Code 연동됨</span>
+                <span className="claude-badge-sub">API Key 없이 유료 구독으로 무료 사용</span>
               </div>
-              <label>
-                <span className="input-label">API Key</span>
-                <input
-                  className="input"
-                  type="password"
-                  placeholder="AIza..."
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                />
-              </label>
-              <p className="small" style={{ marginTop: 8 }}>
-                Google AI Studio(aistudio.google.com)에서 무료 발급
-              </p>
-            </section>
+            </div>
 
             <section className="panel">
               <div className="panel-header">
                 <div>
-                  <span className="step-label">STEP 2</span>
+                  <span className="step-label">STEP 1</span>
                   <h2>문제 업로드</h2>
                 </div>
                 {image && (
