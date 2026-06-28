@@ -2,8 +2,8 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'SNS Emoticon Maker',
-  description: 'Bring your own Gemini API key and create SNS stickers from uploaded images.',
+  title: 'AI 풀이 노트 | REDPAPA',
+  description: '문제 사진을 올리면 AI가 단계별 풀이를 손글씨 노트로 정리합니다.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

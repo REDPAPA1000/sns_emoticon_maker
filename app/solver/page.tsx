@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import Link from 'next/link';
 
 type Section = {
   title: string;
@@ -109,9 +108,7 @@ export default function SolverPage() {
             <span className="brand-dot solver-dot" />
             <span>AI 풀이 노트</span>
           </div>
-          <Link href="/" className="btn secondary solver-back-btn">
-            ← 이모티콘 메이커
-          </Link>
+          <span className="small" style={{ color: '#94a3b8' }}>REDPAPA</span>
         </header>
 
         <section className="page-title no-print">
