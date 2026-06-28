@@ -57,8 +57,9 @@ class KoreanTrigRatioShorts(Scene):
         peak_x = PI / 2
         inflection_point = Dot(axes.c2p(inflection_x, 0), color=WHITE, radius=0.085)
         peak_point = Dot(axes.c2p(peak_x, 1), color=POINT_COLOR, radius=0.095)
-        inflection_label = small_label("변곡점", inflection_point, color=WHITE, size=30, direction=DOWN)
-        peak_label = small_label("극점", peak_point, color=POINT_COLOR, size=30, direction=UP)
+        inflection_label = small_label("변곡점", inflection_point, color=WHITE, size=26, direction=UP, buff=0.18)
+        inflection_label.shift(LEFT * 0.7)
+        peak_label = small_label("극점", peak_point, color=POINT_COLOR, size=30, direction=UP, buff=0.22)
         interval_line = Line(axes.c2p(inflection_x, -0.08), axes.c2p(peak_x, -0.08), color=TITLE_COLOR, stroke_width=5)
         interval_text = ktext("변곡점에서 극점까지", size=31, color=TITLE_COLOR)
         interval_text.next_to(interval_line, DOWN, buff=0.22)
@@ -111,10 +112,10 @@ class KoreanTrigRatioShorts(Scene):
         seg3 = Line(axes.c2p(x_b, -0.16), axes.c2p(peak_x, -0.16), color=THIRD_COLOR, stroke_width=5)
         one_three_label = MathTex(r"1:1:1", font_size=42, color=THIRD_COLOR)
         one_three_label.next_to(seg2, DOWN, buff=0.22)
-        half_label = MathTex(r"\frac{1}{2}", font_size=52, color=THIRD_COLOR)
-        half_label.next_to(point_a, RIGHT, buff=0.16)
-        root_three_label = MathTex(r"\frac{\sqrt{3}}{2}", font_size=52, color=THIRD2_COLOR)
-        root_three_label.next_to(point_b, RIGHT, buff=0.16)
+        half_label = MathTex(r"\frac{1}{2}", font_size=50, color=THIRD_COLOR)
+        half_label.next_to(point_a, LEFT, buff=0.16)
+        root_three_label = MathTex(r"\frac{\sqrt{3}}{2}", font_size=50, color=THIRD2_COLOR)
+        root_three_label.next_to(hline_b, LEFT, buff=0.12)
         self.play(FadeIn(section_title_2), run_time=0.7)
         self.play(Create(seg1), Create(seg2), Create(seg3), FadeIn(one_three_label), run_time=1.2)
         self.play(FadeIn(bottom_a), Create(vline_a), Create(hline_a), FadeIn(point_a, scale=1.3), FadeIn(half_label, shift=RIGHT * 0.1), run_time=1.2)
@@ -139,21 +140,29 @@ class KoreanTrigRatioShorts(Scene):
         self.play(Transform(sine_wave, transformed_wave), run_time=1.8)
         self.wait(0.8)
 
-        # 7. 최종 정리
-        summary_box = RoundedRectangle(width=7.6, height=4.2, corner_radius=0.25, color=TITLE_COLOR, stroke_width=2, fill_color=BLACK, fill_opacity=0.75)
-        summary_box.move_to(DOWN * 1.35)
-        summary_title = ktext("정리", size=42, color=TITLE_COLOR, weight=BOLD)
-        summary_title.move_to(summary_box.get_top() + DOWN * 0.45)
-        summary_1 = ktext("변곡점 ↔ 극점", size=34, color=WHITE)
-        summary_2 = MathTex(r"1:1 \quad \Rightarrow \quad \frac{\sqrt{2}}{2}", font_size=44, color=MID_COLOR)
-        summary_3 = MathTex(r"1:1:1 \quad \Rightarrow \quad \frac{1}{2},\ \frac{\sqrt{3}}{2}", font_size=44, color=THIRD_COLOR)
-        summary_group = VGroup(summary_1, summary_2, summary_3).arrange(DOWN, buff=0.38)
-        summary_group.move_to(summary_box.get_center() + DOWN * 0.15)
-        final_msg = ktext("특수각은 외우는 것이 아니라, 보이는 것이다", size=29, color=GREY_A)
-        final_msg.next_to(summary_box, DOWN, buff=0.35)
-        self.play(FadeOut(expand_group), FadeOut(general_formula), FadeIn(summary_box, scale=0.96), run_time=0.8)
+        # 7. 최종 정리 — 그래프를 먼저 깨끗이 비우고 정리 박스를 중앙에 표시
+        self.play(
+            FadeOut(expand_group), FadeOut(general_formula),
+            FadeOut(axes), FadeOut(sine_wave), FadeOut(formula),
+            FadeOut(inflection_point), FadeOut(peak_point),
+            FadeOut(inflection_label), FadeOut(peak_label), FadeOut(interval_line),
+            run_time=0.8
+        )
+
+        summary_box = RoundedRectangle(width=7.8, height=4.6, corner_radius=0.25, color=TITLE_COLOR, stroke_width=3, fill_color="#111111", fill_opacity=1.0)
+        summary_box.move_to(UP * 0.3)
+        summary_title = ktext("정리", size=44, color=TITLE_COLOR, weight=BOLD)
+        summary_title.move_to(summary_box.get_top() + DOWN * 0.55)
+        summary_1 = ktext("변곡점 ↔ 극점 구간을 등분하면", size=30, color=WHITE)
+        summary_2 = MathTex(r"1:1 \ \Rightarrow\ \frac{\sqrt{2}}{2}", font_size=46, color=MID_COLOR)
+        summary_3 = MathTex(r"1:1:1 \ \Rightarrow\ \frac{1}{2},\ \frac{\sqrt{3}}{2}", font_size=46, color=THIRD_COLOR)
+        summary_group = VGroup(summary_1, summary_2, summary_3).arrange(DOWN, buff=0.5)
+        summary_group.next_to(summary_title, DOWN, buff=0.45)
+        final_msg = ktext("특수각은 외우는 것이 아니라, 보이는 것이다", size=28, color=GREY_A)
+        final_msg.next_to(summary_box, DOWN, buff=0.45)
+        self.play(FadeIn(summary_box, scale=0.96), run_time=0.7)
         self.play(FadeIn(summary_title), FadeIn(summary_group, shift=UP * 0.1), run_time=1.2)
         self.play(FadeIn(final_msg), run_time=0.8)
         self.wait(2.0)
-        self.play(FadeOut(title, subtitle, axes, sine_wave, formula, inflection_point, peak_point, inflection_label, peak_label, interval_line, summary_box, summary_title, summary_group, final_msg), run_time=1.0)
+        self.play(FadeOut(title, subtitle, summary_box, summary_title, summary_group, final_msg), run_time=1.0)
         self.wait(0.5)
