@@ -2,6 +2,7 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
+import Link from 'next/link';
 import ApiKeyBox, { ApiKeyStatus } from '@/components/ApiKeyBox';
 import ImageUploader from '@/components/ImageUploader';
 import StyleGrid from '@/components/StyleGrid';
@@ -136,9 +137,18 @@ export default function Home() {
             <span className="brand-dot" />
             <span>SNS Emoticon Maker</span>
           </div>
-          <span className={`status-badge ${apiKeyStatus}`}>
-            API Key {apiKeyStatus === 'valid' ? '유효' : apiKeyStatus === 'invalid' ? '실패' : apiKeyStatus === 'checking' ? '검증 중' : '대기'}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Link
+              href="/solver"
+              className="btn secondary"
+              style={{ fontSize: 13, padding: '6px 12px', textDecoration: 'none' }}
+            >
+              ✏️ 문제 풀이 노트
+            </Link>
+            <span className={`status-badge ${apiKeyStatus}`}>
+              API Key {apiKeyStatus === 'valid' ? '유효' : apiKeyStatus === 'invalid' ? '실패' : apiKeyStatus === 'checking' ? '검증 중' : '대기'}
+            </span>
+          </div>
         </header>
 
         <section className="page-title">
