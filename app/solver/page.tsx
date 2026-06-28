@@ -10,6 +10,23 @@ type Section = {
 
 const SECTION_PREFIXES = ['📌', '✏️', '✅', '💡'];
 
+type SectionStyle = {
+  pillBg: string;
+  pillBorder: string;
+  pillText: string;
+  bodyColor: string;
+  isAnswer?: boolean;
+};
+
+const SECTION_STYLES: Record<string, SectionStyle> = {
+  '📌': { pillBg: '#dbeafe', pillBorder: '#93c5fd', pillText: '#1d4ed8', bodyColor: '#1e3a8a' },
+  '✏️': { pillBg: '#fefce8', pillBorder: '#fcd34d', pillText: '#92400e', bodyColor: '#78350f' },
+  '✅': { pillBg: '#fef9c3', pillBorder: '#fbbf24', pillText: '#92400e', bodyColor: '#7c2d12', isAnswer: true },
+  '💡': { pillBg: '#d1fae5', pillBorder: '#6ee7b7', pillText: '#065f46', bodyColor: '#064e3b' },
+};
+
+const STEP_COLORS = ['#ef4444', '#22c55e', '#8b5cf6', '#f97316', '#06b6d4', '#ec4899'];
+
 function parseSolution(text: string): Section[] {
   const sections: Section[] = [];
   let current: Section | null = null;
@@ -31,6 +48,77 @@ function parseSolution(text: string): Section[] {
 
   if (current) sections.push(current);
   return sections;
+}
+
+function getPrefix(title: string): string {
+  return SECTION_PREFIXES.find((p) => title.startsWith(p)) ?? '';
+}
+
+function NoteSection({ sec }: { sec: Section }) {
+  const prefix = getPrefix(sec.title);
+  const style = SECTION_STYLES[prefix];
+
+  if (!style) {
+    return (
+      <div className="nb-section">
+        {sec.title && <div className="nb-line" style={{ color: '#334155' }}>{sec.title}</div>}
+        {sec.lines.map((line, j) => (
+          <div key={j} className="nb-line">{line}</div>
+        ))}
+      </div>
+    );
+  }
+
+  if (style.isAnswer) {
+    return (
+      <div className="nb-section">
+        <div
+          className="nb-answer-box"
+          style={{ background: style.pillBg, border: `2px solid ${style.pillBorder}` }}
+        >
+          <div className="nb-answer-label" style={{ color: style.pillText }}>{sec.title}</div>
+          {sec.lines.map((line, j) => (
+            <div key={j} className="nb-answer-line" style={{ color: style.bodyColor }}>{line}</div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="nb-section">
+      <div
+        className="nb-pill"
+        style={{
+          background: style.pillBg,
+          border: `1.5px solid ${style.pillBorder}`,
+          color: style.pillText,
+        }}
+      >
+        {sec.title}
+      </div>
+      {sec.lines.map((line, j) => {
+        const stepMatch = line.match(/^(\d+)단계[.·\s](.*)/);
+        if (stepMatch) {
+          const num = parseInt(stepMatch[1]);
+          const badgeColor = STEP_COLORS[(num - 1) % STEP_COLORS.length];
+          return (
+            <div key={j} className="nb-step-row">
+              <span className="nb-step-badge" style={{ background: badgeColor }}>{num}</span>
+              <span className="nb-step-text" style={{ color: badgeColor }}>
+                {stepMatch[2]}
+              </span>
+            </div>
+          );
+        }
+        return (
+          <div key={j} className="nb-line" style={{ color: style.bodyColor }}>
+            {line}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function SolverPage() {
@@ -96,12 +184,6 @@ export default function SolverPage() {
 
   return (
     <main className="app-shell">
-      {/* 인쇄 전용 헤더 — 화면에서는 숨김 */}
-      <div className="print-header" aria-hidden>
-        <span className="print-header-brand">AI 풀이 노트</span>
-        <span className="print-header-sub">REDPAPA · 수학 풀이 노트</span>
-      </div>
-
       <div className="workspace">
         <header className="topbar no-print">
           <div className="brand inline-brand">
@@ -185,7 +267,6 @@ export default function SolverPage() {
 
           {/* 오른쪽: 노트 */}
           <div className="solver-right">
-            {/* 노트 툴바 */}
             <div className="notebook-toolbar no-print">
               <span className="notebook-label">풀이 노트</span>
               {solution && (
@@ -195,26 +276,19 @@ export default function SolverPage() {
               )}
             </div>
 
-            {/* 인쇄 영역 시작 */}
             <div id="print-area">
-              {/* 문제 이미지 — 인쇄 시 노트 위에 표시 */}
-              {image && solution && (
-                <div className="print-problem-img">
-                  <p className="print-img-label">[ 문 제 ]</p>
-                  <img src={image} alt="문제" />
-                </div>
-              )}
-
               <div className="notebook-paper">
+                {/* 노트 상단: 손글씨처럼 자연스러운 타이틀 */}
+                <div className="nb-page-header">
+                  <span className="nb-page-title-text">AI 풀이 노트</span>
+                  <span className="nb-page-brand">REDPAPA</span>
+                </div>
+                <div className="nb-page-rule" />
+
                 <div className="notebook-content">
                   {solution ? (
                     sections.map((sec, i) => (
-                      <div key={i} className="nb-section">
-                        {sec.title && <div className="nb-title">{sec.title}</div>}
-                        {sec.lines.map((line, j) => (
-                          <div key={j} className="nb-line">{line}</div>
-                        ))}
-                      </div>
+                      <NoteSection key={i} sec={sec} />
                     ))
                   ) : (
                     <div className="nb-placeholder">
@@ -231,16 +305,12 @@ export default function SolverPage() {
                     </div>
                   )}
                 </div>
-              </div>
 
-              {/* 인쇄 푸터 */}
-              {solution && (
-                <div className="print-footer" aria-hidden>
-                  AI 풀이 노트 · REDPAPA
-                </div>
-              )}
+                {solution && (
+                  <div className="nb-page-footer">AI 풀이 노트 · REDPAPA</div>
+                )}
+              </div>
             </div>
-            {/* 인쇄 영역 끝 */}
           </div>
         </div>
       </div>

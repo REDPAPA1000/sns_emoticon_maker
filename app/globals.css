@@ -2,22 +2,15 @@
   color-scheme: light;
   --bg: #f8fafc;
   --card: rgba(255, 255, 255, 0.72);
-  --card-hover: rgba(255, 255, 255, 0.86);
   --input: rgba(255, 255, 255, 0.70);
   --border: rgba(15, 23, 42, 0.08);
   --primary: #6366f1;
   --primary-strong: #4f46e5;
-  --primary-glow: rgba(99, 102, 241, 0.10);
-  --green: #10b981;
-  --red: #ef4444;
-  --amber: #f59e0b;
   --text: #0f172a;
   --muted: #64748b;
-  --soft: #f1f5f9;
 }
 
 * { box-sizing: border-box; }
-
 html { scroll-behavior: smooth; }
 
 body {
@@ -27,9 +20,7 @@ body {
   background-color: var(--bg);
   background-image:
     radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(244, 63, 94, 0.03) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.04) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(139, 92, 246, 0.04) 0px, transparent 50%);
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
   background-attachment: fixed;
   color: var(--text);
 }
@@ -37,10 +28,26 @@ body {
 button, input, select { font: inherit; }
 a { color: inherit; }
 
+/* ── Shell ── */
+
 .app-shell {
   min-height: 100vh;
-  display: block;
   padding: 16px;
+}
+
+.workspace {
+  width: min(980px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 4px 0;
 }
 
 .brand {
@@ -56,34 +63,13 @@ a { color: inherit; }
   height: 10px;
   border-radius: 999px;
   background: #3b82f6;
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.60);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
   flex: 0 0 auto;
 }
 
-.workspace {
-  width: min(980px, 100%);
-  margin: 0 auto;
-  min-width: 0;
-  display: grid;
-  gap: 16px;
-}
+.inline-brand { font-size: 18px; }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 6px 4px 0;
-}
-
-.inline-brand {
-  min-width: 0;
-  font-size: 18px;
-}
-
-.page-title {
-  padding: 4px 4px 0;
-}
+.page-title { padding: 4px 4px 0; }
 
 .page-kicker,
 .step-label {
@@ -108,13 +94,14 @@ h2 {
   line-height: 1.2;
 }
 
-.panel,
-.card {
+/* ── Panel ── */
+
+.panel {
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--card);
   backdrop-filter: blur(16px);
-  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.10), 0 1px 3px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.1), 0 1px 3px rgba(15, 23, 42, 0.04);
   padding: 20px;
 }
 
@@ -126,12 +113,9 @@ h2 {
   margin-bottom: 14px;
 }
 
-.input,
-.ghost-button,
-.icon-button,
-.btn {
-  border-radius: 8px;
-}
+/* ── Inputs & Buttons ── */
+
+.input, .ghost-button, .btn { border-radius: 8px; }
 
 .input {
   width: 100%;
@@ -155,18 +139,16 @@ h2 {
   font-weight: 700;
 }
 
-.ghost-button,
-.icon-button {
+.ghost-button {
   border: 1px solid var(--border);
   background: rgba(255,255,255,.55);
   color: #475569;
   cursor: pointer;
   font-weight: 700;
+  padding: 9px 12px;
 }
 
-.ghost-button { padding: 9px 12px; }
 .ghost-button.compact { min-width: 58px; padding-inline: 10px; }
-.icon-button { width: 34px; height: 34px; font-size: 20px; line-height: 1; }
 
 .btn {
   display: inline-flex;
@@ -194,6 +176,8 @@ h2 {
 .btn.full { width: 100%; margin-top: 14px; }
 .btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
 
+/* ── Upload ── */
+
 .upload-drop {
   min-height: 210px;
   display: grid;
@@ -210,10 +194,9 @@ h2 {
 .upload-drop span { display: grid; gap: 6px; text-align: center; color: #475569; }
 .upload-drop small { color: var(--muted); }
 
-.primary-action {
-  min-height: 48px;
-  font-size: 16px;
-}
+/* ── Misc ── */
+
+.primary-action { min-height: 48px; font-size: 16px; }
 
 .small {
   color: var(--muted);
@@ -227,17 +210,11 @@ h2 {
   white-space: pre-wrap;
 }
 
-/* ===== Solver ===== */
+/* ── Solver layout ── */
 
 .solver-dot {
   background: #f59e0b;
   box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
-}
-
-.solver-back-btn {
-  font-size: 13px;
-  padding: 6px 12px;
-  text-decoration: none;
 }
 
 .solver-btn {
@@ -256,17 +233,21 @@ h2 {
   align-items: start;
 }
 
-.solver-left {
-  display: grid;
-  gap: 16px;
-}
+.solver-left { display: grid; gap: 16px; }
 
 .solver-right {
   position: sticky;
   top: 20px;
 }
 
-/* ===== Notebook ===== */
+/* ── Notebook toolbar ── */
+
+.notebook-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
 
 .notebook-label {
   font-size: 12px;
@@ -276,52 +257,175 @@ h2 {
   text-transform: uppercase;
 }
 
+.print-btn {
+  font-size: 13px;
+  padding: 6px 14px;
+  margin-top: 0;
+}
+
+/* ════════════════════════════════════════
+   Notebook Paper
+   ════════════════════════════════════════ */
+
 .notebook-paper {
   position: relative;
-  min-height: 540px;
-  background-color: #fffef4;
+  background-color: #fefef8;
   background-image: repeating-linear-gradient(
     transparent,
     transparent 39px,
-    #b8cde8 39px,
-    #b8cde8 40px
+    #cad9ea 39px,
+    #cad9ea 40px
   );
-  border-radius: 3px;
+  border-radius: 4px;
   box-shadow:
-    3px 4px 20px rgba(0, 0, 0, 0.13),
-    0 1px 3px rgba(0, 0, 0, 0.06),
-    inset 0 0 60px rgba(255, 250, 200, 0.4);
-  overflow: hidden;
-  font-family: 'Nanum Pen Script', 'Gowun Handwriting', cursive;
+    4px 6px 24px rgba(0, 0, 0, 0.14),
+    0 1px 4px rgba(0, 0, 0, 0.06),
+    inset 0 0 80px rgba(255, 252, 210, 0.35);
+  font-family: 'Nanum Pen Script', cursive;
   font-size: 20px;
   line-height: 40px;
   color: #1a1830;
+  overflow: hidden;
 }
+
+/* ── Page header: 노트 첫 줄처럼 자연스럽게 ── */
+
+.nb-page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 6px 24px 0;
+  line-height: 40px; /* 첫 번째 줄선에 정확히 앉힘 */
+}
+
+.nb-page-title-text {
+  font-family: 'Nanum Pen Script', cursive;
+  font-size: 28px;
+  color: #1e3a8a;
+  letter-spacing: 0.02em;
+}
+
+.nb-page-brand {
+  font-family: 'Nanum Pen Script', cursive;
+  font-size: 17px;
+  color: #b0bfd4;
+  letter-spacing: 0.06em;
+}
+
+/* 타이틀 아래 손으로 긋는 줄처럼 */
+.nb-page-rule {
+  height: 2px;
+  margin: 0 20px;
+  background: linear-gradient(to right, #b0c4de 0%, #d4e2f0 60%, transparent 100%);
+  border-radius: 1px;
+  opacity: 0.8;
+}
+
+/* ── Content area ── */
 
 .notebook-content {
-  padding: 4px 28px 40px 28px;
+  padding: 6px 24px 40px;
   position: relative;
-  z-index: 2;
 }
+
+/* ── Section pill header ── */
 
 .nb-section {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
-.nb-title {
-  font-size: 21px;
+.nb-pill {
+  display: inline-block;
+  padding: 2px 18px 2px 14px;
+  border-radius: 20px;
+  font-size: 19px;
   font-weight: 700;
-  color: #1e3a8a;
-  line-height: 40px;
-  padding-top: 4px;
+  margin: 8px 0 2px;
+  line-height: 38px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
+
+/* ── Step rows ── */
+
+.nb-step-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 2px 0;
+}
+
+.nb-step-badge {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.nb-step-text {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* ── Body line ── */
 
 .nb-line {
   line-height: 40px;
   min-height: 40px;
   white-space: pre-wrap;
   word-break: break-word;
+  padding-left: 4px;
 }
+
+/* ── Answer box ── */
+
+.nb-answer-box {
+  margin: 10px 0 6px;
+  padding: 10px 20px 14px;
+  border-radius: 12px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.nb-answer-label {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 40px;
+  margin-bottom: 2px;
+}
+
+.nb-answer-line {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+
+/* ── Page footer ── */
+
+.nb-page-footer {
+  padding: 6px 24px 10px;
+  font-family: 'Nanum Pen Script', cursive;
+  font-size: 15px;
+  color: #b8c8d8;
+  text-align: right;
+  border-top: 1px solid #dde7f0;
+  margin-top: 10px;
+  letter-spacing: 0.05em;
+}
+
+/* ── Placeholder & loading ── */
 
 .nb-placeholder {
   display: grid;
@@ -357,57 +461,23 @@ h2 {
   40% { transform: scale(1); opacity: 1; }
 }
 
-.notebook-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.print-btn {
-  font-size: 13px;
-  padding: 6px 14px;
-  margin-top: 0;
-}
-
-.print-problem-img {
-  display: none;
-}
-
-.print-header {
-  display: none;
-}
-
-.print-footer {
-  display: none;
-}
-
-.print-img-label {
-  margin: 0 0 6px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #555;
-}
-
-/* ===== @media print ===== */
+/* ════════════════════════════════════════
+   Print
+   ════════════════════════════════════════ */
 
 @media print {
   @page {
     size: A4;
-    margin: 14mm 16mm 14mm 16mm;
+    margin: 12mm 14mm;
   }
 
   .no-print,
-  .notebook-toolbar,
-  .solver-left,
-  .topbar,
-  .page-title {
+  .notebook-toolbar {
     display: none !important;
   }
 
   body {
     background: white !important;
-    font-size: 14px;
   }
 
   .app-shell,
@@ -420,72 +490,43 @@ h2 {
     margin: 0 !important;
     position: static !important;
     gap: 0 !important;
-  }
-
-  .print-header {
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    background: #1e2a50;
-    color: white;
-    padding: 10px 16px;
-    margin-bottom: 14px;
-    border-radius: 4px;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .print-header-brand {
-    font-size: 16px;
-    font-weight: 800;
-  }
-
-  .print-header-sub {
-    font-size: 12px;
-    color: #a0afdc;
-  }
-
-  .print-problem-img {
-    display: block !important;
-    margin-bottom: 14px;
-    page-break-inside: avoid;
-  }
-
-  .print-problem-img img {
-    max-width: 100%;
-    max-height: 280px;
-    object-fit: contain;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
   }
 
   .notebook-paper {
-    min-height: unset !important;
     box-shadow: none !important;
     border: none !important;
-    font-size: 16px !important;
-    background-color: #fffef4 !important;
+    background-color: #fefef8 !important;
     background-image: repeating-linear-gradient(
       transparent,
       transparent 33px,
-      #b8cde8 33px,
-      #b8cde8 34px
+      #cad9ea 33px,
+      #cad9ea 34px
     ) !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    font-size: 16px !important;
     line-height: 34px !important;
   }
+
+  .nb-page-header {
+    line-height: 34px;
+    padding: 4px 20px 0;
+  }
+
+  .nb-page-title-text { font-size: 24px; }
+  .nb-page-brand { font-size: 15px; }
+  .nb-page-rule { margin: 0 16px; }
 
   .notebook-content {
-    padding: 4px 16px 20px 16px !important;
+    padding: 4px 20px 20px !important;
   }
 
-  .nb-title {
-    font-size: 18px !important;
-    line-height: 34px !important;
-    color: #1e3a8a !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  .nb-pill {
+    font-size: 16px !important;
+    line-height: 32px !important;
   }
 
   .nb-line {
@@ -494,25 +535,26 @@ h2 {
     font-size: 16px !important;
   }
 
-  .print-footer {
-    display: block !important;
-    text-align: right;
-    font-size: 11px;
-    color: #999;
-    margin-top: 12px;
-    padding-top: 6px;
-    border-top: 1px solid #ddd;
+  .nb-step-row { min-height: 34px; }
+  .nb-step-text { font-size: 16px !important; }
+
+  .nb-answer-box { margin: 6px 0 4px; padding: 8px 16px 10px; }
+  .nb-answer-line { font-size: 22px !important; }
+
+  .nb-page-footer {
+    font-size: 13px;
+    padding: 4px 20px 6px;
   }
 }
 
-/* ===== Responsive ===== */
+/* ════════════════════════════════════════
+   Responsive
+   ════════════════════════════════════════ */
 
 @media (max-width: 760px) {
   .app-shell { padding: 10px; }
   .workspace { gap: 12px; }
-  .topbar { align-items: flex-start; }
-  .inline-brand { font-size: 16px; }
-  .panel, .card { padding: 16px; }
+  .panel { padding: 16px; }
   .solver-layout { grid-template-columns: 1fr; }
   .solver-right { position: static; }
   .notebook-paper { font-size: 18px; }
