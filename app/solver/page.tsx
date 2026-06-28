@@ -90,13 +90,21 @@ export default function SolverPage() {
     }
   };
 
+  const handlePrint = () => window.print();
+
   const sections = solution ? parseSolution(solution) : [];
   const canSolve = Boolean(apiKey && image && !loading);
 
   return (
     <main className="app-shell">
+      {/* 인쇄 전용 헤더 — 화면에서는 숨김 */}
+      <div className="print-header" aria-hidden>
+        <span className="print-header-brand">AI 풀이 노트</span>
+        <span className="print-header-sub">REDPAPA · 수학 풀이 노트</span>
+      </div>
+
       <div className="workspace">
-        <header className="topbar">
+        <header className="topbar no-print">
           <div className="brand inline-brand">
             <span className="brand-dot solver-dot" />
             <span>AI 풀이 노트</span>
@@ -106,7 +114,7 @@ export default function SolverPage() {
           </Link>
         </header>
 
-        <section className="page-title">
+        <section className="page-title no-print">
           <span className="page-kicker">REDPAPA WEB APP</span>
           <h1>AI 손글씨 풀이 노트</h1>
           <p className="small" style={{ marginTop: 6 }}>
@@ -116,7 +124,7 @@ export default function SolverPage() {
 
         <div className="solver-layout">
           {/* 왼쪽: 입력 패널 */}
-          <div className="solver-left">
+          <div className="solver-left no-print">
             <section className="panel">
               <div className="panel-header">
                 <div>
@@ -180,8 +188,26 @@ export default function SolverPage() {
 
           {/* 오른쪽: 노트 */}
           <div className="solver-right">
-            <div className="notebook-wrapper">
+            {/* 노트 툴바 */}
+            <div className="notebook-toolbar no-print">
               <span className="notebook-label">풀이 노트</span>
+              {solution && (
+                <button className="btn secondary print-btn" onClick={handlePrint}>
+                  📄 PDF 저장
+                </button>
+              )}
+            </div>
+
+            {/* 인쇄 영역 시작 */}
+            <div id="print-area">
+              {/* 문제 이미지 — 인쇄 시 노트 위에 표시 */}
+              {image && solution && (
+                <div className="print-problem-img">
+                  <p className="print-img-label">[ 문 제 ]</p>
+                  <img src={image} alt="문제" />
+                </div>
+              )}
+
               <div className="notebook-paper">
                 <div className="notebook-content">
                   {solution ? (
@@ -209,7 +235,15 @@ export default function SolverPage() {
                   )}
                 </div>
               </div>
+
+              {/* 인쇄 푸터 */}
+              {solution && (
+                <div className="print-footer" aria-hidden>
+                  AI 풀이 노트 · REDPAPA
+                </div>
+              )}
             </div>
+            {/* 인쇄 영역 끝 */}
           </div>
         </div>
       </div>
